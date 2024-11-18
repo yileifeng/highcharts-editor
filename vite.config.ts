@@ -1,10 +1,11 @@
 import { defineConfig } from 'vite';
 import type { UserConfigExport } from 'vite';
 import vue from '@vitejs/plugin-vue';
+import dsv from '@rollup/plugin-dsv';
 import path from 'path';
 
 const baseConfig: UserConfigExport = {
-    plugins: [vue()],
+    plugins: [vue(), dsv()],
     define: {
         'process.env': process.env
     },
