@@ -1,0 +1,10 @@
+key,enValue,enValid,frValue,frValid
+editor.lang.en,English,1,Anglais,1
+editor.lang.fr,French,1,Français,1
+editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
+editor.title,Highcharts Editor,1,Highcharts Editor,0
+editor.expand,Expand,1,Expand,0
+editor.collapse,Collapse,1,Collapse,0
+editor.toc.data,Chart Data,1,Chart Data,0
+editor.toc.chartType,Chart Templates,1,Chart Templates,0
+editor.toc.chartCustomize,Customize Chart,1,Customize Chart,0
