@@ -4,6 +4,8 @@
     </div>
 </template>
 
-<script lang="ts"></script>
+<script setup lang="ts">
+import { ref, watch, onMounted } from 'vue';
+</script>
 
 <style lang="scss"></style>

@@ -3,6 +3,7 @@ import App from './app.vue';
 
 import router from './router';
 import i18n from './lang';
+import './style.css';
 
 import VueTippy from 'vue-tippy';
 import HighchartsVue from 'highcharts-vue';
