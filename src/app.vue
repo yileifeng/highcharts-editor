@@ -21,7 +21,7 @@
         </header>
 
         <div class="items-stretch flex">
-            <SideMenu></SideMenu>
+            <SideMenu :lang="appLang"></SideMenu>
             <div class="content w-full flex-grow">
                 <router-view :key="$route.path"></router-view>
             </div>
@@ -30,12 +30,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import SideMenu from './components/side-menu.vue';
 
-const lang = ref('en');
+const props = defineProps({
+    lang: {
+        type: String
+    }
+});
+
+const appLang = ref('');
+
+onMounted(() => {
+    appLang.value = props.lang || 'en';
+});
+
 const changeLang = (): void => {
-    lang.value = lang.value === 'en' ? 'fr' : 'en';
+    appLang.value = appLang.value === 'en' ? 'fr' : 'en';
 };
 
 const saveChanges = (): void => {

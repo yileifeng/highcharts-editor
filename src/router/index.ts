@@ -1,4 +1,4 @@
-import { createRouter, createWebHashHistory } from 'vue-router';
+import { createRouter, createWebHashHistory, RouteLocationNormalized } from 'vue-router';
 import DataSection from '@/components/data-section.vue';
 import ChartSelection from '@/components/chart-selection.vue';
 import ConfigCustomization from '@/components/config-customization.vue';
@@ -6,21 +6,23 @@ import ConfigCustomization from '@/components/config-customization.vue';
 const routes = [
     {
         path: '/',
+        redirect: (to: RouteLocationNormalized) => {
+            return '/data';
+        }
+    },
+    {
+        path: '/data',
+        name: 'Data',
         component: DataSection
     },
     {
-        path: '/data-section',
-        name: 'DataSection',
-        component: DataSection
-    },
-    {
-        path: '/chart-selection',
-        name: 'ChartSelection',
+        path: '/chart',
+        name: 'ChartType',
         component: ChartSelection
     },
     {
-        path: '/config-customization',
-        name: 'ConfigCustomization',
+        path: '/customization',
+        name: 'Customization',
         component: ConfigCustomization
     }
 ];
