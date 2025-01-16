@@ -23,3 +23,13 @@ editor.data.paste,Paste your data,1,Collez vos données,0
 editor.data.paste.label,Use pasted data,1,Utiliser des données collées,0
 editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans la case ci-dessous",0
 editor.data.paste.placeholder,Paste data here,1,Collez les données ici,
+editor.data.modify,"Here, you can modify your dataset.",1,"Ici, vous pouvez modifier votre jeu de données",0
+editor.datatable.uploadNew,Upload new data,1,Télécharger de nouvelles données,0
+editor.datatable.rowActions,Row actions,1,Actions sur les lignes,0
+editor.datatable.rowActions.delete,Delete row(s),1,Supprimer des lignes,0
+editor.datatable.rowActions.insertBelow,Insert below,1,Insérer ci-dessous,0
+editor.datatable.rowActions.insertAbove,Insert above,1,Insérer ci-dessus,0
+editor.datatable.colActions,Column actions,1,Actions de colonne,0
+editor.datatable.colActions.delete,Delete column(s),1,Supprimer des colonnes,0
+editor.datatable.colActions.insertLeft,Insert left,1,Insérer à gauche,0
+editor.datatable.colActions.insertRight,Insert right,1,Insérer à droite,0

@@ -11,4 +11,4 @@ declare module '*lang.csv' {
 
 declare module 'highcharts-vue';
 declare module 'vue-tippy';
-T
+declare module 'vue-papa-parse';
