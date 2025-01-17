@@ -1,6 +1,6 @@
 <template>
     <nav
-        :class="expanded ? 'w-64' : ''"
+        :class="expanded ? 'w-72' : ''"
         class="side-menu sticky self-start w-16 duration-500 ease-in-out transition-width"
     >
         <div class="flex items-center mt-4 mb-12">
@@ -36,11 +36,12 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    to="/data-section"
+                    :class="{ disabled: $route.name !== 'Data' }"
+                    :to="{ name: 'Data' }"
                     v-tippy="{
                         delay: '200',
                         placement: 'right',
-                        content: $t('editor.toc.data'),
+                        content: $t('editor.data.title'),
                         animateFill: true,
                         animation: 'chapter-menu'
                     }"
@@ -61,15 +62,16 @@
                             stroke-linejoin="round"
                         ></path>
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
-                        >{{ $t('editor.toc.data') }}</span
-                    >
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
+                        $t('editor.data.title')
+                    }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    to="/chart-selection"
+                    :class="{ disabled: $route.name !== 'ChartType' }"
+                    :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
                         placement: 'right',
@@ -106,15 +108,16 @@
                             stroke-linejoin="round"
                         ></path>
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
-                        >{{ $t('editor.toc.chartType') }}</span
-                    >
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
+                        $t('editor.toc.chartType')
+                    }}</span>
                 </router-link>
             </li>
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    to="/config-customization"
+                    :class="{ disabled: $route.name !== 'Customization' }"
+                    :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',
                         placement: 'right',
@@ -135,17 +138,64 @@
                             d="M2 6c0-1.505.78-3.08 2-4 0 .845.69 2 2 2 1.657 0 3 1.343 3 3 0 .386-.08.752-.212 1.09.74.594 1.476 1.19 2.19 1.81L8.9 11.98c-.62-.716-1.214-1.454-1.807-2.192C6.753 9.92 6.387 10 6 10c-2.21 0-4-1.79-4-4zm12.152 6.848l1.34-1.34c.607.304 1.283.492 2.008.492 2.485 0 4.5-2.015 4.5-4.5 0-.725-.188-1.4-.493-2.007L18 9l-2-2 3.507-3.507C18.9 3.188 18.225 3 17.5 3 15.015 3 13 5.015 13 7.5c0 .725.188 1.4.493 2.007L3 20l2 2 6.848-6.848c1.885 1.928 3.874 3.753 5.977 5.45l1.425 1.148 1.5-1.5-1.15-1.425c-1.695-2.103-3.52-4.092-5.448-5.977z"
                         ></path>
                     </svg>
-                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap"
-                        >{{ $t('editor.toc.chartCustomize') }}</span
-                    >
+                    <span class="flex-1 ml-4 overflow-hidden leading-normal overflow-ellipsis whitespace-nowrap">{{
+                        $t('editor.toc.chartCustomize')
+                    }}</span>
                 </router-link>
             </li>
         </ul>
+
+        <div v-if="expanded">
+            <button
+                class="flex bg-black text-white justify-center border border-black w-full hover:bg-gray-400 font-bold px-4 py-2 my-2"
+            >
+                <svg
+                    class="flex-shrink-0 mr-1"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    stroke="#FFFFFF"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M12.5 17L12.5 4M12.5 4L18 8.78947M12.5 4L7 8.78947"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    ></path>
+                    <path d="M6 21H19" stroke-width="2" stroke-linecap="round"></path>
+                </svg>
+                {{ $t('editor.toc.importChart') }}
+            </button>
+            <button
+                class="flex bg-white justify-center border border-black w-full hover:bg-gray-100 font-bold px-4 py-2 my-2"
+            >
+                <svg
+                    class="flex-shrink-0"
+                    xmlns="http://www.w3.org/2000/svg"
+                    width="24"
+                    height="24"
+                    stroke="#000000"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12"
+                        stroke-width="2"
+                        stroke-linecap="round"
+                    ></path></svg
+                >{{ $t('editor.toc.exportConfig') }}
+            </button>
+        </div>
     </nav>
 </template>
 
 <script setup lang="ts">
 import { ref } from 'vue';
+
+defineProps({
+    lang: {
+        type: String
+    }
+});
 
 const expanded = ref(false);
 </script>
@@ -170,5 +220,10 @@ const expanded = ref(false);
 
 .side-nav-content::-webkit-scrollbar {
     display: none; /* Safari and Chrome */
+}
+
+.disabled {
+    opacity: 0.5;
+    pointer-events: none;
 }
 </style>

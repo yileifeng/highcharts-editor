@@ -2,9 +2,34 @@ key,enValue,enValid,frValue,frValid
 editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
 editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
-editor.title,Highcharts Editor,1,Highcharts Editor,0
-editor.expand,Expand,1,Expand,0
-editor.collapse,Collapse,1,Collapse,0
-editor.toc.data,Chart Data,1,Chart Data,0
-editor.toc.chartType,Chart Templates,1,Chart Templates,0
-editor.toc.chartCustomize,Customize Chart,1,Customize Chart,0
+editor.title,Highcharts Editor,1,Éditeur de Highcharts,0
+editor.expand,Expand,1,Développer,0
+editor.collapse,Collapse,1,Effondrement,0
+editor.label.or,or,1,ou,1
+editor.label.cancel,Cancel,1,Annuler,0
+editor.label.import,Import data,1,Importer des données,0
+editor.toc.chartType,Templates,1,Modèles,0
+editor.toc.chartCustomize,Customize Chart,1,Personnaliser le Graphique,0
+editor.toc.importChart,Import existing chart,1,Importer un graphique existant,0
+editor.toc.exportConfig,Export configuration (.json),1,Exporter la configuration (.json),0
+editor.data.title,Data,1,Données,1
+editor.data.description,"Upload your data to start creating a highchart. You may either import data by uploading a file or pasting your data directly.",1,"Téléchargez vos données pour commencer à créer un highchart. Vous pouvez soit importer des données en téléchargeant un fichier, soit en collant vos données directement.",0
+editor.data.drag,Drag and drop file here,1,Glissez et déposez le fichier ici,0
+editor.data.upload,Select file from device,1,Sélectionner un fichier sur l'appareil,0
+editor.data.supported,"Supported file types: csv, xls, xlsx",1,"Types de fichiers pris en charge : csv, xls, xlsx",0
+editor.data.import,Import data from file,1,Importer des données à partir d'un fichier,0
+editor.data.import.instructions,You may only upload one file at a time. You may remove this file to select another.,1,Vous ne pouvez télécharger qu'un seul fichier à la fois. Vous pouvez supprimer ce fichier pour en sélectionner un autre.,0
+editor.data.paste,Paste your data,1,Collez vos données,0
+editor.data.paste.label,Use pasted data,1,Utiliser des données collées,0
+editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans la case ci-dessous",0
+editor.data.paste.placeholder,Paste data here,1,Collez les données ici,
+editor.data.modify,"Here, you can modify your dataset.",1,"Ici, vous pouvez modifier votre jeu de données",0
+editor.datatable.uploadNew,Upload new data,1,Télécharger de nouvelles données,0
+editor.datatable.rowActions,Row actions,1,Actions sur les lignes,0
+editor.datatable.rowActions.delete,Delete row(s),1,Supprimer des lignes,0
+editor.datatable.rowActions.insertBelow,Insert below,1,Insérer ci-dessous,0
+editor.datatable.rowActions.insertAbove,Insert above,1,Insérer ci-dessus,0
+editor.datatable.colActions,Column actions,1,Actions de colonne,0
+editor.datatable.colActions.delete,Delete column(s),1,Supprimer des colonnes,0
+editor.datatable.colActions.insertLeft,Insert left,1,Insérer à gauche,0
+editor.datatable.colActions.insertRight,Insert right,1,Insérer à droite,0
