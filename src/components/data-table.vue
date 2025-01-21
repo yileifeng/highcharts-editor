@@ -87,11 +87,14 @@
                 </tbody>
             </table>
         </div>
+
+        <!-- TODO: display preview of chart -->
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, onMounted } from 'vue';
+import { computed, reactive, ref, inject, onMounted } from 'vue';
+import { useDataStore } from '../stores/dataStore';
 
 const props = defineProps({
     uploadedFile: {
@@ -105,9 +108,10 @@ const props = defineProps({
 const emit = defineEmits(['back']);
 
 const $papa: any = inject('$papa');
+const dataStore = useDataStore();
 
-const headers = ref<string[]>([]);
-const gridData = ref<any[]>([]);
+const headers = computed(() => dataStore.headers);
+const gridData = computed(() => dataStore.gridData);
 
 let selectedRows = reactive({});
 let selectedCols = reactive({});
@@ -134,8 +138,8 @@ onMounted(() => {
             header: true, // first row headers
             skipEmptyLines: true,
             complete: (res) => {
-                headers.value = res.meta.fields || [];
-                gridData.value = res.data.map(row => headers.value.map(header => row[header]));
+                dataStore.setHeaders(res.meta.fields || []);
+                dataStore.setGridData(res.data.map(row => dataStore.headers.map(header => row[header])));
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
@@ -150,15 +154,15 @@ const handleRowAction = (): void => {
     const rowIdxs = Object.keys(selectedRows).filter((idx) => selectedRows[idx]);
     switch (rowAction.value) {
         case rowActions.delete: {
-            deleteRows(rowIdxs);
+            dataStore.deleteRows(rowIdxs);
             break;
         }
         case rowActions.insertBelow: {
-            addNewRow(rowIdxs[0], true);
+            dataStore.addNewRow(rowIdxs[0], true);
             break;
         }
         case rowActions.insertAbove: {
-            addNewRow(rowIdxs[0], false);
+            dataStore.addNewRow(rowIdxs[0], false);
             break;
         }
     }
@@ -172,15 +176,15 @@ const handleColAction = (): void => {
     const colIdxs = Object.keys(selectedCols).filter((idx) => selectedCols[idx]);
     switch (colAction.value) {
         case colActions.delete: {
-            deleteCols(colIdxs);
+            dataStore.deleteCols(colIdxs);
             break;
         }
         case colActions.insertRight: {
-            addNewCol(colIdxs[0], true);
+            dataStore.addNewCol(colIdxs[0], true);
             break;
         }
         case colActions.insertLeft: {
-            addNewCol(colIdxs[0], false);
+            dataStore.addNewCol(colIdxs[0], false);
             break;
         }
     }
@@ -188,47 +192,6 @@ const handleColAction = (): void => {
     // clear col action selection
     selectedCols = reactive({});
     colAction.value = '';
-};
-
-const deleteRows = (selectedRowIdxs: string[]): void => {
-    gridData.value = gridData.value.filter((_, idx) => !selectedRowIdxs.includes(idx.toString()));
-};
-
-const addNewRow = (selectedRowIdx: string, below: boolean = true): void => {
-    const newRow = headers.value.map(() => '');
-    const newIdx = parseInt(selectedRowIdx);
-    // add empty row based on insert above/below
-    if (below) {
-        gridData.value.splice(newIdx + 1, 0, newRow);
-    } else {
-        gridData.value.splice(newIdx, 0, newRow);
-    }
-};
-
-const deleteCols = (selectedColIdxs: string[]): void => {
-    // sort indices in descending to avoid issues with shifting
-    const selectedIdxs = selectedColIdxs.map((idx: string) => parseInt(idx)).sort().reverse();
-
-    // for each col delete its header and all col values from grid
-    selectedIdxs.forEach(idx => {
-        headers.value.splice(idx, 1);
-    });
-    gridData.value.forEach(row => {
-        selectedIdxs.forEach(idx => {
-            row.splice(idx, 1);
-        });
-    });
-};
-
-const addNewCol = (selectedColIdx: string, right: boolean = true): void => {
-    const newCol = '';
-    // determine new position based on insert right/left
-    const newIdx = right ? selectedColIdx + 1 : selectedColIdx;
-    // add new header and empty col of values
-    headers.value.splice(parseInt(newIdx), 0, newCol); 
-    gridData.value.forEach((row) => {
-        row.splice(newIdx, 0, '');
-    });
 };
 </script>
 

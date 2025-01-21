@@ -36,7 +36,6 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: $route.name !== 'Data' }"
                     :to="{ name: 'Data' }"
                     v-tippy="{
                         delay: '200',
@@ -70,7 +69,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: $route.name !== 'ChartType' }"
+                    :class="{ disabled: !uploaded }"
                     :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
@@ -116,7 +115,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: $route.name !== 'Customization' }"
+                    :class="{ disabled: !uploaded }"
                     :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',
@@ -189,13 +188,17 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { computed, ref } from 'vue';
+import { useDataStore } from '../stores/dataStore';
 
 defineProps({
     lang: {
         type: String
     }
 });
+
+const dataStore = useDataStore();
+const uploaded = computed(() => dataStore.uploaded);
 
 const expanded = ref(false);
 </script>

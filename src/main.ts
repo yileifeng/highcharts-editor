@@ -1,4 +1,5 @@
 import { createApp } from 'vue';
+import { createPinia } from 'pinia';
 import App from './app.vue';
 
 import router from './router';
@@ -16,8 +17,10 @@ import 'vue-final-modal/style.css';
 const vfm = createVfm();
 
 const app = createApp(App);
+const pinia = createPinia();
 
-app.use(router)
+app.use(pinia)
+    .use(router)
     .use(i18n)
     .use(HighchartsVue, { tagName: 'charts' })
     .use(VuePapaParse)
