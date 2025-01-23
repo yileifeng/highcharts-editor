@@ -22,7 +22,7 @@ const pinia = createPinia();
 app.use(pinia)
     .use(router)
     .use(i18n)
-    .use(HighchartsVue, { tagName: 'charts' })
+    .use(HighchartsVue, { tagName: 'highchart' })
     .use(VuePapaParse)
     .use(VueTippy, {
         directive: 'tippy',

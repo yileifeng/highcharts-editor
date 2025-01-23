@@ -114,7 +114,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
 import { useDataStore } from '../stores/dataStore';
 
@@ -127,6 +127,10 @@ const dataFile = ref<File | undefined>(undefined);
 const fileName = ref<String>('');
 const datatableView = ref<Boolean>(false);
 const pastedData = ref<String>('');
+
+onMounted(() => {
+    
+});
 
 const onFileUpload = (event: Event) => {
     const uploadedFile = Array.from((event.target as HTMLInputElement).files as ArrayLike<File>)[0];

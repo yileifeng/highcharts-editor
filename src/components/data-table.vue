@@ -66,8 +66,18 @@
                             v-for="(header, colIdx) in headers"
                             :key="colIdx"
                         >
-                            <input type="checkbox" v-model="selectedCols[colIdx]" />
-                            {{ header }}
+                            <span class="col-header" v-if="editingHeader !== colIdx" @click="editColHeader(colIdx)">
+                                {{ header }}
+                            </span>
+                            <input
+                                v-else
+                                class="border border-black"
+                                type="text"
+                                v-model="headers[colIdx]"
+                                @blur="escEditCell"
+                                @keyup.enter="escEditCell"
+                            />
+                            <input class="ml-2" type="checkbox" v-model="selectedCols[colIdx]" />
                         </th>
                     </tr>
                 </thead>
@@ -77,11 +87,27 @@
                             <input type="checkbox" v-model="selectedRows[rowIdx]" />
                         </td>
                         <td
-                            class="border border-gray-400 p-2 text-left align-middle"
+                        class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(value, colIdx) in row"
                             :key="colIdx"
                         >
-                            {{ value }}
+                            <span
+                                class="grid-cell"
+                                v-if="editingCell.rowIdx !== rowIdx || editingCell.colIdx !== colIdx"
+                                @click="editCell(rowIdx, colIdx, value)"
+                            >
+                                {{ value }}
+                            </span>
+                            <input
+                                v-else
+                                class="border border-black w-full"
+                                type="text"
+                                v-model="editingVal"
+                                @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
+                                @blur="escEditCell"
+                                @keyup.enter="escEditCell"
+                                autofocus
+                            />
                         </td>
                     </tr>
                 </tbody>
@@ -93,7 +119,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, inject, onMounted } from 'vue';
+import { computed, reactive, ref, inject, onBeforeUnmount, onMounted } from 'vue';
 import { useDataStore } from '../stores/dataStore';
 
 const props = defineProps({
@@ -112,6 +138,10 @@ const dataStore = useDataStore();
 
 const headers = computed(() => dataStore.headers);
 const gridData = computed(() => dataStore.gridData);
+
+const editingHeader = ref(-1);
+const editingCell = ref({ rowIdx: -1, colIdx: -1 });
+const editingVal = ref('');
 
 let selectedRows = reactive({});
 let selectedCols = reactive({});
@@ -139,7 +169,7 @@ onMounted(() => {
             skipEmptyLines: true,
             complete: (res) => {
                 dataStore.setHeaders(res.meta.fields || []);
-                dataStore.setGridData(res.data.map(row => dataStore.headers.map(header => row[header])));
+                dataStore.setGridData(res.data.map((row) => dataStore.headers.map((header) => row[header])));
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
@@ -148,7 +178,44 @@ onMounted(() => {
     } else {
         // TODO - handle pasted data
     }
+
+    document.addEventListener('click', handleMouseClick);
 });
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleMouseClick);
+});
+
+// turn off grid edit inputs on mouse click
+const handleMouseClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement;
+    // ignore if clicking on a grid cell element
+    if (target.closest('.grid-cell') || target.closest('.col-header')) {
+        return;
+    } else {
+        escEditCell();
+    }
+};
+
+
+const editColHeader = (colIdx: number) => {
+    editingHeader.value = colIdx;
+};
+
+const editCell = (rowIdx: number, colIdx: number, val: string) => {
+    editingCell.value = { rowIdx: rowIdx, colIdx: colIdx };
+    editingVal.value = val;
+};
+
+const escEditCell = () => {
+    editingHeader.value = -1;
+    editingCell.value = { rowIdx: -1, colIdx: -1 };
+    editingVal.value = '';
+};
+
+const updateCell = (rowIdx: number, colIdx: number, val: string) => {
+    dataStore.updateCell(rowIdx, colIdx, val);
+}
 
 const handleRowAction = (): void => {
     const rowIdxs = Object.keys(selectedRows).filter((idx) => selectedRows[idx]);

@@ -14,7 +14,6 @@ export const useDataStore = defineStore('chartData', {
         /* Initially set grid data when uploaded new file **/
         setGridData(data: string[][]) {
             this.gridData = data;
-            console.log('SETTING GRI DDATA: ', this.gridData);
         },
         /* Set flag if user has uploaded valid chart data format **/
         toggleUploaded(uploaded: boolean) {
@@ -22,8 +21,8 @@ export const useDataStore = defineStore('chartData', {
         },
         /* Update cell value in grid data **/
         updateCell(row: number, col: number, value: string) {
-            if (this.chartData[row]) {
-                this.chartData[row][col] = value;
+            if (this.gridData[row]) {
+                this.gridData[row][col] = value;
             }
         },
         /* Delete row(s) from grid data **/
