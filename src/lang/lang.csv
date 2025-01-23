@@ -4,6 +4,7 @@ editor.lang.fr,French,1,Français,1
 editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
 editor.title,Highcharts Editor,1,Éditeur de Highcharts,0
 editor.expand,Expand,1,Développer,0
+editor.preview,Preview,1,Aperçu,1
 editor.collapse,Collapse,1,Effondrement,0
 editor.label.or,or,1,ou,1
 editor.label.cancel,Cancel,1,Annuler,0
@@ -33,3 +34,10 @@ editor.datatable.colActions,Column actions,1,Actions de colonne,0
 editor.datatable.colActions.delete,Delete column(s),1,Supprimer des colonnes,0
 editor.datatable.colActions.insertLeft,Insert left,1,Insérer à gauche,0
 editor.datatable.colActions.insertRight,Insert right,1,Insérer à droite,0
+editor.selection.title,Templates,1,Modèles,0
+editor.selection.template,Select chart template,1,Sélectionner un modèle de graphique,0
+editor.selection.bar,Bar chart,1,Graphique à barres,0
+editor.selection.column,Column chart,1,Diagramme à colonnes,0
+editor.selection.line,Line chart,1,Graphique linéaire,0
+editor.selection.scatter,Scatter plot,1,Nuage de points,0
+editor.selection.pie,Pie chart,1,Diagramme circulaire,0

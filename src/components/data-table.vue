@@ -66,8 +66,18 @@
                             v-for="(header, colIdx) in headers"
                             :key="colIdx"
                         >
-                            <input type="checkbox" v-model="selectedCols[colIdx]" />
-                            {{ header }}
+                            <span class="col-header" v-if="editingHeader !== colIdx" @click="editColHeader(colIdx)">
+                                {{ header }}
+                            </span>
+                            <input
+                                v-else
+                                class="border border-black"
+                                type="text"
+                                v-model="headers[colIdx]"
+                                @blur="escEditCell"
+                                @keyup.enter="escEditCell"
+                            />
+                            <input class="ml-2" type="checkbox" v-model="selectedCols[colIdx]" />
                         </th>
                     </tr>
                 </thead>
@@ -77,21 +87,40 @@
                             <input type="checkbox" v-model="selectedRows[rowIdx]" />
                         </td>
                         <td
-                            class="border border-gray-400 p-2 text-left align-middle"
+                        class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(value, colIdx) in row"
                             :key="colIdx"
                         >
-                            {{ value }}
+                            <span
+                                class="grid-cell"
+                                v-if="editingCell.rowIdx !== rowIdx || editingCell.colIdx !== colIdx"
+                                @click="editCell(rowIdx, colIdx, value)"
+                            >
+                                {{ value }}
+                            </span>
+                            <input
+                                v-else
+                                class="border border-black w-full"
+                                type="text"
+                                v-model="editingVal"
+                                @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
+                                @blur="escEditCell"
+                                @keyup.enter="escEditCell"
+                                autofocus
+                            />
                         </td>
                     </tr>
                 </tbody>
             </table>
         </div>
+
+        <!-- TODO: display preview of chart -->
     </div>
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, inject, onMounted } from 'vue';
+import { computed, reactive, ref, inject, onBeforeUnmount, onMounted } from 'vue';
+import { useDataStore } from '../stores/dataStore';
 
 const props = defineProps({
     uploadedFile: {
@@ -105,9 +134,14 @@ const props = defineProps({
 const emit = defineEmits(['back']);
 
 const $papa: any = inject('$papa');
+const dataStore = useDataStore();
 
-const headers = ref<string[]>([]);
-const gridData = ref<any[]>([]);
+const headers = computed(() => dataStore.headers);
+const gridData = computed(() => dataStore.gridData);
+
+const editingHeader = ref(-1);
+const editingCell = ref({ rowIdx: -1, colIdx: -1 });
+const editingVal = ref('');
 
 let selectedRows = reactive({});
 let selectedCols = reactive({});
@@ -134,8 +168,8 @@ onMounted(() => {
             header: true, // first row headers
             skipEmptyLines: true,
             complete: (res) => {
-                headers.value = res.meta.fields || [];
-                gridData.value = res.data.map(row => headers.value.map(header => row[header]));
+                dataStore.setHeaders(res.meta.fields || []);
+                dataStore.setGridData(res.data.map((row) => dataStore.headers.map((header) => row[header])));
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
@@ -144,21 +178,58 @@ onMounted(() => {
     } else {
         // TODO - handle pasted data
     }
+
+    document.addEventListener('click', handleMouseClick);
 });
+
+onBeforeUnmount(() => {
+    document.removeEventListener('click', handleMouseClick);
+});
+
+// turn off grid edit inputs on mouse click
+const handleMouseClick = (event: MouseEvent): void => {
+    const target = event.target as HTMLElement;
+    // ignore if clicking on a grid cell element
+    if (target.closest('.grid-cell') || target.closest('.col-header')) {
+        return;
+    } else {
+        escEditCell();
+    }
+};
+
+
+const editColHeader = (colIdx: number) => {
+    editingHeader.value = colIdx;
+};
+
+const editCell = (rowIdx: number, colIdx: number, val: string) => {
+    editingCell.value = { rowIdx: rowIdx, colIdx: colIdx };
+    editingVal.value = val;
+};
+
+const escEditCell = () => {
+    editingHeader.value = -1;
+    editingCell.value = { rowIdx: -1, colIdx: -1 };
+    editingVal.value = '';
+};
+
+const updateCell = (rowIdx: number, colIdx: number, val: string) => {
+    dataStore.updateCell(rowIdx, colIdx, val);
+}
 
 const handleRowAction = (): void => {
     const rowIdxs = Object.keys(selectedRows).filter((idx) => selectedRows[idx]);
     switch (rowAction.value) {
         case rowActions.delete: {
-            deleteRows(rowIdxs);
+            dataStore.deleteRows(rowIdxs);
             break;
         }
         case rowActions.insertBelow: {
-            addNewRow(rowIdxs[0], true);
+            dataStore.addNewRow(rowIdxs[0], true);
             break;
         }
         case rowActions.insertAbove: {
-            addNewRow(rowIdxs[0], false);
+            dataStore.addNewRow(rowIdxs[0], false);
             break;
         }
     }
@@ -172,15 +243,15 @@ const handleColAction = (): void => {
     const colIdxs = Object.keys(selectedCols).filter((idx) => selectedCols[idx]);
     switch (colAction.value) {
         case colActions.delete: {
-            deleteCols(colIdxs);
+            dataStore.deleteCols(colIdxs);
             break;
         }
         case colActions.insertRight: {
-            addNewCol(colIdxs[0], true);
+            dataStore.addNewCol(colIdxs[0], true);
             break;
         }
         case colActions.insertLeft: {
-            addNewCol(colIdxs[0], false);
+            dataStore.addNewCol(colIdxs[0], false);
             break;
         }
     }
@@ -188,47 +259,6 @@ const handleColAction = (): void => {
     // clear col action selection
     selectedCols = reactive({});
     colAction.value = '';
-};
-
-const deleteRows = (selectedRowIdxs: string[]): void => {
-    gridData.value = gridData.value.filter((_, idx) => !selectedRowIdxs.includes(idx.toString()));
-};
-
-const addNewRow = (selectedRowIdx: string, below: boolean = true): void => {
-    const newRow = headers.value.map(() => '');
-    const newIdx = parseInt(selectedRowIdx);
-    // add empty row based on insert above/below
-    if (below) {
-        gridData.value.splice(newIdx + 1, 0, newRow);
-    } else {
-        gridData.value.splice(newIdx, 0, newRow);
-    }
-};
-
-const deleteCols = (selectedColIdxs: string[]): void => {
-    // sort indices in descending to avoid issues with shifting
-    const selectedIdxs = selectedColIdxs.map((idx: string) => parseInt(idx)).sort().reverse();
-
-    // for each col delete its header and all col values from grid
-    selectedIdxs.forEach(idx => {
-        headers.value.splice(idx, 1);
-    });
-    gridData.value.forEach(row => {
-        selectedIdxs.forEach(idx => {
-            row.splice(idx, 1);
-        });
-    });
-};
-
-const addNewCol = (selectedColIdx: string, right: boolean = true): void => {
-    const newCol = '';
-    // determine new position based on insert right/left
-    const newIdx = right ? selectedColIdx + 1 : selectedColIdx;
-    // add new header and empty col of values
-    headers.value.splice(parseInt(newIdx), 0, newCol); 
-    gridData.value.forEach((row) => {
-        row.splice(newIdx, 0, '');
-    });
 };
 </script>
 

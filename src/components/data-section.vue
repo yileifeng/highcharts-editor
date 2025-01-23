@@ -1,6 +1,6 @@
 <template>
     <div class="data-section m-6">
-        <div class="text-xl font-bold">{{ $t('editor.data.title') }}</div>
+        <div class="text-2xl font-bold">{{ $t('editor.data.title') }}</div>
         <template v-if="!datatableView">
             <div class="mt-4">{{ $t('editor.data.description') }}</div>
 
@@ -72,7 +72,10 @@
                     class="bg-slate-600 text-white border border-black hover:bg-gray-400 font-bold p-4"
                     :class="{ 'disabled hover:bg-gray-400': !fileName }"
                     :disabled="!fileName"
-                    @click="() => (datatableView = true)"
+                    @click="() => {
+                        datatableView = true;
+                        dataStore.toggleUploaded(true);
+                    }"
                 >
                     {{ $t('editor.data.import') }}
                 </button>
@@ -98,24 +101,36 @@
         <template v-else>
             <data-table
                 :uploadedFile="dataFile"
-                :pastedFile="pastedData as string"
-                @back="() => (datatableView = false)"
+                :pastedFile="pastedData"
+                @back="
+                    () => {
+                        datatableView = false;
+                        dataStore.toggleUploaded(false);
+                    }
+                "
             ></data-table>
         </template>
     </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
+import { useDataStore } from '../stores/dataStore';
 
 import PasteData from './helpers/paste-data.vue';
 import DataTable from './data-table.vue';
+
+const dataStore = useDataStore();
 
 const dataFile = ref<File | undefined>(undefined);
 const fileName = ref<String>('');
 const datatableView = ref<Boolean>(false);
 const pastedData = ref<String>('');
+
+onMounted(() => {
+    
+});
 
 const onFileUpload = (event: Event) => {
     const uploadedFile = Array.from((event.target as HTMLInputElement).files as ArrayLike<File>)[0];
