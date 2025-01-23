@@ -1,9 +1,99 @@
 <template>
-    <div class="">
-        This is the chart selection section for highcharts editor
+    <div class="chart-selection m-6">
+        <div class="text-2xl font-bold">{{ $t('editor.selection.title') }}</div>
+        <div class="mt-6">{{ $t('editor.selection.template') }}</div>
+        <select class="border border-black w-2/3 mt-2 p-2 rounded" v-model="chartType" @change="handleChartSelection()">
+            <!-- Enable insert when exactly one row is selected, enable delete when any number of rows are selected -->
+            <option v-for="template in Object.keys(chartTemplates)" :key="template" :value="template">
+                {{ $t(`editor.selection.${template}`) }}
+            </option>
+        </select>
+
+        <div v-if="!loading">
+            <div class="mt-6">{{ $t('editor.preview') }}</div>
+            <!-- Preview of chart -->
+            <div class="dv-chart-container items-stretch h-full w-full mt-2">
+                <highchart :options="chartConfig"></highchart>
+            </div>
+        </div>
     </div>
 </template>
 
-<script setup lang="ts"></script>
+<script setup lang="ts">
+import { computed, ref, onMounted } from 'vue';
+import { useChartStore } from '../stores/chartStore';
+import { useDataStore } from '../stores/dataStore';
+
+import Highcharts from 'highcharts';
+import dataModule from 'highcharts/modules/data';
+
+dataModule(Highcharts);
+
+const chartStore = useChartStore();
+const chartConfig = computed(() => chartStore.chartConfig);
+
+const dataStore = useDataStore();
+
+const chartType = ref<string>('');
+const chartTemplates: Record<string, string> = {
+    bar: 'bar',
+    column: 'column',
+    line: 'line',
+    scatter: 'scatter',
+    pie: 'pie'
+};
+
+const loading = ref<boolean>(true);
+
+const handleChartSelection = (): void => {
+    switch (chartType.value) {
+        case chartTemplates.bar: {
+            chartType.value = 'bar';
+            const categories = dataStore.gridData.map((row) => row[0]);
+            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+
+            chartStore.setupBarChart(categories, seriesData);
+            break;
+        }
+        case chartTemplates.column: {
+            chartType.value = 'column';
+            const categories = dataStore.gridData.map((row) => row[0]);
+            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+
+            chartStore.setupColumnChart(categories, seriesData);
+            break;
+        }
+        case chartTemplates.line: {
+            chartType.value = 'line';
+            const categories = dataStore.gridData.map((row) => row[0]);
+            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+
+            chartStore.setupLineChart(categories, seriesData);
+            break;
+        }
+        case chartTemplates.scatter: {
+            chartType.value = 'scatter';
+            const seriesData = dataStore.gridData.map((row) => ({
+                x: parseFloat(row[0]),
+                y: parseFloat(row[1])
+            }));
+
+            chartStore.setupScatterPlot(seriesData);
+            break;
+        }
+        case chartTemplates.pie: {
+            chartType.value = 'pie';
+            const data = dataStore.gridData.map((row) => ({
+                name: row[0],
+                y: parseFloat(row[1])
+            }));
+
+            chartStore.setupPieChart(data);
+            break;
+        }
+    }
+    loading.value = false;
+};
+</script>
 
 <style lang="scss"></style>
