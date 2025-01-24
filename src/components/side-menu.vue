@@ -183,6 +183,33 @@
                     ></path></svg
                 >{{ $t('editor.toc.exportConfig') }}
             </button>
+
+            <!-- Fried egg -->
+            <a
+                class="absolute right-2 bottom-2"
+                href="https://www.youtube.com/watch?v=zzk0VQ0dVMU&feature=youtu.be"
+                target="_blank"
+                v-if="chartStore.chartConfig && chartStore.chartConfig.title.text.toLowerCase() === 'easteregg'"
+            >
+                <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#000000">
+                    <g id="SVGRepo_iconCarrier">
+                        <path
+                            fill="#F3F3F3"
+                            d="M67.283 96.847c-31.675 10.868-26.284-8.737-53.132-23.014-26.776-14.24-12.708-42.414 18.464-60.401 37.712-21.76 74.573-17.987 66.18 17.987-8.393 35.972-4.946 55.519-31.512 65.428z"
+                        ></path>
+                        <circle fill="#F0C419" cx="50" cy="47" r="19"></circle>
+                        <path
+                            stroke="#ffffff"
+                            stroke-width="4"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-miterlimit="10"
+                            d="M79 7.031c6.138 0 13.807 6.252 15.077 14.969M53 35.378c3.757 1.081 6.71 3.965 8.025 7.622"
+                            fill="none"
+                        ></path>
+                    </g>
+                </svg>
+            </a>
         </div>
     </nav>
 </template>
@@ -190,6 +217,9 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue';
 import { useDataStore } from '../stores/dataStore';
+import { useChartStore } from '../stores/chartStore';
+
+const chartStore = useChartStore();
 
 defineProps({
     lang: {
