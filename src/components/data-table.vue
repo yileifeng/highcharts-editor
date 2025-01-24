@@ -71,7 +71,7 @@
                             </span>
                             <input
                                 v-else
-                                class="border border-black"
+                                class="col-header border border-black"
                                 type="text"
                                 v-model="headers[colIdx]"
                                 @blur="escEditCell"
@@ -87,7 +87,7 @@
                             <input type="checkbox" v-model="selectedRows[rowIdx]" />
                         </td>
                         <td
-                        class="border border-gray-400 p-2 text-left align-middle"
+                            class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(value, colIdx) in row"
                             :key="colIdx"
                         >
@@ -100,13 +100,12 @@
                             </span>
                             <input
                                 v-else
-                                class="border border-black w-full"
+                                class="grid-cell border border-black w-full"
                                 type="text"
                                 v-model="editingVal"
                                 @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
                                 @blur="escEditCell"
                                 @keyup.enter="escEditCell"
-                                autofocus
                             />
                         </td>
                     </tr>
@@ -114,13 +113,23 @@
             </table>
         </div>
 
-        <!-- TODO: display preview of chart -->
+        <div class="font-bold mt-8">{{ $t('editor.preview') }}</div>
+        <!-- Preview of chart -->
+        <div class="dv-chart-container items-stretch h-full w-full mt-2">
+            <highchart :options="chartConfig"></highchart>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
 import { computed, reactive, ref, inject, onBeforeUnmount, onMounted } from 'vue';
 import { useDataStore } from '../stores/dataStore';
+import { useChartStore } from '../stores/chartStore';
+
+import Highcharts from 'highcharts';
+import dataModule from 'highcharts/modules/data';
+
+dataModule(Highcharts);
 
 const props = defineProps({
     uploadedFile: {
@@ -135,9 +144,11 @@ const emit = defineEmits(['back']);
 
 const $papa: any = inject('$papa');
 const dataStore = useDataStore();
+const chartStore = useChartStore();
 
 const headers = computed(() => dataStore.headers);
 const gridData = computed(() => dataStore.gridData);
+const chartConfig = computed(() => chartStore.chartConfig);
 
 const editingHeader = ref(-1);
 const editingCell = ref({ rowIdx: -1, colIdx: -1 });
@@ -161,7 +172,9 @@ const colActions: Record<string, string> = {
 };
 
 onMounted(() => {
-    if (props.uploadedFile) {
+    if (gridData && gridData.value.length) {
+        return;
+    } else if (props.uploadedFile) {
         const file = props.uploadedFile;
         // parse uploaded file
         $papa.parse(file, {
@@ -170,6 +183,11 @@ onMounted(() => {
             complete: (res) => {
                 dataStore.setHeaders(res.meta.fields || []);
                 dataStore.setGridData(res.data.map((row) => dataStore.headers.map((header) => row[header])));
+
+                // default preview of datatable to line graph
+                const categories = dataStore.gridData.map((row) => row[0]);
+                const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+                chartStore.setupLineChart(categories, seriesData);
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
@@ -197,7 +215,6 @@ const handleMouseClick = (event: MouseEvent): void => {
     }
 };
 
-
 const editColHeader = (colIdx: number) => {
     editingHeader.value = colIdx;
 };
@@ -215,7 +232,7 @@ const escEditCell = () => {
 
 const updateCell = (rowIdx: number, colIdx: number, val: string) => {
     dataStore.updateCell(rowIdx, colIdx, val);
-}
+};
 
 const handleRowAction = (): void => {
     const rowIdxs = Object.keys(selectedRows).filter((idx) => selectedRows[idx]);
