@@ -22,7 +22,7 @@
 
         <div class="items-stretch flex">
             <SideMenu :lang="appLang"></SideMenu>
-            <div class="content w-full flex-grow">
+            <div class="grid-container z-20 w-full flex-grow min-w-0">
                 <router-view :key="$route.path"></router-view>
             </div>
         </div>
@@ -60,5 +60,10 @@ const saveChanges = (): void => {
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     color: #2c3e50;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(1, calc(100%));
 }
 </style>

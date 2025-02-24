@@ -1,55 +1,10 @@
 import { defineStore } from 'pinia';
-
-interface HighchartsConfig {
-    chart: {
-        type: string;
-    };
-    title: {
-        text: string;
-    };
-    credits?: {
-        enabled: boolean;
-    };
-    subtitle?: {
-        text: string;
-    };
-    yAxis?: {
-        title: {
-            text: string;
-        };
-    };
-    xAxis?: {
-        title: {
-            text: string;
-        };
-        categories: (number | string)[];
-    };
-    data?: {
-        csvURL: string;
-        enablePolling: boolean;
-    };
-    plotOptions?: any;
-    exporting?: {
-        buttons: {
-            contextButton: {
-                menuItems: string[];
-            };
-        };
-        enabled?: boolean;
-    };
-    series?: SeriesData[] | { data: SeriesData[] };
-}
-
-interface SeriesData {
-    name: string;
-    y?: number;
-    data?: number[];
-    type?: string;
-}
+import { HighchartsConfig } from '../definitions';
 
 export const useChartStore = defineStore('chartProperties', {
     state: () => ({
-        chartType: '' as string,
+        chartType: 'line' as string,
+        chartSeries: [] as string[],
         chartConfig: {} as HighchartsConfig
     }),
     actions: {
@@ -58,116 +13,154 @@ export const useChartStore = defineStore('chartProperties', {
             this.chartType = chartType;
         },
         /* Setup highcharts configuration for line chart **/
-        setupLineChart(cats: string[], seriesData: number[]) {
+        setupLineChart(seriesNames: string[], cats: string[], seriesData: number[]) {
             this.chartConfig = {
-                chart: {
-                    type: 'line'
-                },
                 title: {
                     text: 'Line Chart'
                 },
+                subtitle: {
+                    text: ''
+                },
                 xAxis: {
-                    cats
+                    categories: cats,
+                    title: {
+                        text: ''
+                    }
                 },
                 yAxis: {
                     title: {
-                        text: 'Value'
+                        text: ''
                     }
                 },
                 series: [
                     {
-                        name: 'Series 1',
+                        name: seriesNames[0],
+                        type: 'line',
+                        color: '#2caffe',
+                        dashStyle: 'solid',
+                        marker: {
+                            symbol: 'circle'
+                        },
                         data: seriesData
                     }
                 ]
             };
+            console.log('SETTING UP LINE CHART: ', this.chartConfig);
         },
         /* Setup highcharts configuration for bar chart **/
-        setupBarChart(cats: string[], seriesData: number[]) {
+        setupBarChart(seriesNames: string[], cats: string[], seriesData: number[]) {
             this.chartConfig = {
-                chart: {
-                    type: 'bar'
-                },
                 title: {
                     text: 'Bar Chart'
                 },
+                subtitle: {
+                    text: ''
+                },
                 xAxis: {
-                    cats
+                    categories: cats,
+                    title: {
+                        text: ''
+                    }
                 },
                 yAxis: {
                     title: {
-                        text: 'Value'
+                        text: ''
                     }
                 },
                 series: [
                     {
-                        name: 'Series 1',
+                        name: seriesNames[0],
+                        type: 'bar',
+                        color: '#2caffe',
+                        dashStyle: 'solid',
+                        marker: {
+                            symbol: 'circle'
+                        },
                         data: seriesData
                     }
                 ]
             };
+            console.log('SETTING UP BAR CHART: ', this.chartConfig);
         },
         /* Setup highcharts configuration for scatter plot **/
-        setupScatterPlot(seriesData: { x: number; y: number }[]) {
+        setupScatterPlot(seriesNames: string[], seriesData: { x: number; y: number }[] | number[], cats?: string[]) {
             this.chartConfig = {
-                chart: {
-                    type: 'scatter'
-                },
                 title: {
                     text: 'Scatter Plot'
                 },
+                subtitle: {
+                    text: ''
+                },
                 xAxis: {
+                    ...(cats ? { categories: cats } : {}),
                     title: {
-                        text: 'X Axis'
+                        text: ''
                     }
                 },
                 yAxis: {
                     title: {
-                        text: 'Y Axis'
+                        text: ''
                     }
                 },
                 series: [
                     {
-                        name: 'Scatter Data',
+                        name: seriesNames[0],
+                        type: 'scatter',
+                        color: '#2caffe',
+                        dashStyle: 'solid',
+                        marker: {
+                            symbol: 'circle'
+                        },
                         data: seriesData
                     }
                 ]
             };
+            console.log('CHART CONFIG SCATTER: ', this.chartConfig);
         },
         /* Setup highcharts configuration for column chart **/
-        setupColumnChart(cats: string[], seriesData: number[]) {
+        setupColumnChart(seriesNames: string[], cats: string[], seriesData: number[]) {
             this.chartConfig = {
-                chart: {
-                    type: 'column'
-                },
                 title: {
                     text: 'Column Chart'
                 },
+                subtitle: {
+                    text: ''
+                },
                 xAxis: {
-                    cats
+                    categories: cats,
+                    title: {
+                        text: ''
+                    }
                 },
                 yAxis: {
                     title: {
-                        text: 'Value'
+                        text: ''
                     }
                 },
                 series: [
                     {
-                        name: 'Series 1',
+                        name: seriesNames[0],
+                        type: 'column',
+                        color: '#2caffe',
+                        dashStyle: 'solid',
                         data: seriesData
                     }
                 ]
             };
         },
         /* Setup highcharts configuration for pie chart **/
-        setupPieChart(data: { name: string; y: number }[]) {
+        setupPieChart(seriesNames: string[], seriesData: { name: string; y: number }[]) {
             this.chartConfig = {
-                chart: { type: 'pie' },
                 title: { text: 'Pie Chart' },
+                subtitle: {
+                    text: ''
+                },
+                colors: [],
                 series: [
                     {
-                        name: 'Share',
-                        data
+                        name: seriesNames[0],
+                        type: 'pie',
+                        data: seriesData
                     }
                 ]
             };

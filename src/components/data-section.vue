@@ -129,7 +129,9 @@ const datatableView = ref<Boolean>(false);
 const pastedData = ref<String>('');
 
 onMounted(() => {
-    
+    if (dataStore.gridData && dataStore.gridData.length) {
+        datatableView.value = true;
+    }
 });
 
 const onFileUpload = (event: Event) => {
