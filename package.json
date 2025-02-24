@@ -16,6 +16,7 @@
         "pinia": "^2.3.1",
         "sass": "^1.80.6",
         "vue": "^3.4.37",
+        "vue-accessible-color-picker": "^5.2.0",
         "vue-final-modal": "^4.5.5",
         "vue-i18n": "^10.0.4",
         "vue-papa-parse": "^3.1.0",

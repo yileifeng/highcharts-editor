@@ -180,8 +180,9 @@
                         d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12"
                         stroke-width="2"
                         stroke-linecap="round"
-                    ></path></svg
-                >{{ $t('editor.toc.exportConfig') }}
+                    ></path>
+                </svg>
+                {{ $t('editor.toc.exportConfig') }}
             </button>
 
             <!-- Fried egg -->
@@ -189,7 +190,7 @@
                 class="absolute right-2 bottom-2"
                 href="https://www.youtube.com/watch?v=zzk0VQ0dVMU&feature=youtu.be"
                 target="_blank"
-                v-if="chartStore.chartConfig && chartStore.chartConfig.title.text.toLowerCase() === 'easteregg'"
+                v-if="chartStore.chartConfig && chartStore.chartConfig.title?.text.toLowerCase() === 'easteregg'"
             >
                 <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <g id="SVGRepo_iconCarrier">

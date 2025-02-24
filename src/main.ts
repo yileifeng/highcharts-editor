@@ -12,6 +12,9 @@ import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';
 import 'tippy.js/dist/backdrop.css';
 
+import ColorPicker from 'vue-accessible-color-picker';
+import 'vue-accessible-color-picker/styles';
+
 import { createVfm } from 'vue-final-modal';
 import 'vue-final-modal/style.css';
 const vfm = createVfm();
@@ -24,6 +27,7 @@ app.use(pinia)
     .use(i18n)
     .use(HighchartsVue, { tagName: 'highchart' })
     .use(VuePapaParse)
+    .use(ColorPicker)
     .use(VueTippy, {
         directive: 'tippy',
         component: 'tippy'

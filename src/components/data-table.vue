@@ -118,6 +118,12 @@
         <div class="dv-chart-container items-stretch h-full w-full mt-2">
             <highchart :options="chartConfig"></highchart>
         </div>
+
+        <router-link class="flex items-center mt-4" :to="{ name: 'ChartType' }">
+            <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
+                {{ $t('editor.datatable.templates') }}
+            </button>
+        </router-link>
     </div>
 </template>
 
@@ -187,7 +193,7 @@ onMounted(() => {
                 // default preview of datatable to line graph
                 const categories = dataStore.gridData.map((row) => row[0]);
                 const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
-                chartStore.setupLineChart(categories, seriesData);
+                chartStore.setupLineChart(Object.values(dataStore.headers).slice(1), categories, seriesData);
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
