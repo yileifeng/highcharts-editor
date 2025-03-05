@@ -180,10 +180,9 @@ const colActions: Record<string, string> = {
 onMounted(() => {
     if (gridData && gridData.value.length) {
         return;
-    } else if (props.uploadedFile) {
-        const file = props.uploadedFile;
-        // parse uploaded file
-        $papa.parse(file, {
+    } else {
+        // parse uploaded file or pasted data
+        $papa.parse(props.uploadedFile || props.pastedFile, {
             header: true, // first row headers
             skipEmptyLines: true,
             complete: (res) => {
@@ -199,10 +198,7 @@ onMounted(() => {
                 console.error('Error parsing file: ', err);
             }
         });
-    } else {
-        // TODO - handle pasted data
     }
-
     document.addEventListener('click', handleMouseClick);
 });
 
