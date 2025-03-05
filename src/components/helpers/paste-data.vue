@@ -34,11 +34,21 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const emit = defineEmits(['import']);
 
-const pastedData = ref(undefined);
+const props = defineProps({
+    pastedData: {
+        type: String
+    }
+});
+
+const pastedData = ref<string>('');
+
+onMounted(() => {
+    pastedData.value = props.pastedData || '';
+});
 </script>
 <style lang="scss">
 .paste-box {

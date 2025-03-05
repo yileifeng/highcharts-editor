@@ -30,7 +30,7 @@
                         class="bg-white border border-black hover:bg-gray-100 font-bold p-4"
                         :class="{ 'disabled hover:bg-gray-400': fileName }"
                         :disabled="fileName !== ''"
-                        @click="$refs.fileInput.click()"
+                        @click="fileInput?.click()"
                     >
                         {{ $t('editor.data.upload') }}
                     </button>
@@ -94,7 +94,7 @@
                 content-class="h-5/6 overflow-y-auto w-1/2 mx-4 p-7 bg-white border rounded-lg"
                 class="flex justify-center items-center"
             >
-                <paste-data @import="parsePastedData"></paste-data>
+                <paste-data @import="parsePastedData" :pastedData="pastedData"></paste-data>
             </vue-final-modal>
         </template>
 
@@ -124,9 +124,11 @@ import DataTable from './data-table.vue';
 const dataStore = useDataStore();
 
 const dataFile = ref<File | undefined>(undefined);
-const fileName = ref<String>('');
-const datatableView = ref<Boolean>(false);
-const pastedData = ref<String>('');
+const fileName = ref<string>('');
+const datatableView = ref<boolean>(false);
+const pastedData = ref<string>('');
+
+const fileInput = ref<HTMLInputElement | null>(null);
 
 onMounted(() => {
     if (dataStore.gridData && dataStore.gridData.length) {
@@ -149,6 +151,8 @@ const uploadFile = (event: DragEvent) => {
 
 const parsePastedData = (content: string) => {
     pastedData.value = content;
+    datatableView.value = true;
+    dataStore.toggleUploaded(true);
 };
 </script>
 
