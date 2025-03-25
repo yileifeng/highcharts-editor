@@ -3,6 +3,7 @@ editor.lang.en,English,1,Anglais,1
 editor.lang.fr,French,1,Français,1
 editor.saveChanges,Save Changes,1,Enregistrer les modifications,1
 editor.title,Highcharts Editor,1,Éditeur de Highcharts,0
+editor.untitled,Untitled,1,Sans titre,0
 editor.expand,Expand,1,Développer,0
 editor.preview,Preview,1,Aperçu,1
 editor.collapse,Collapse,1,Effondrement,0

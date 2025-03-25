@@ -57,7 +57,7 @@
 
         <!-- Datatable -->
         <div class="overflow-x-auto">
-            <table class="table-auto border-collapse border border-black w-full mt-8" border="1">
+            <table class="table-auto border-collapse border border-black w-full mt-8">
                 <thead>
                     <tr class="bg-gray-200">
                         <th class="border border-gray-400 p-2 text-left align-middle"></th>
@@ -66,18 +66,20 @@
                             v-for="(header, colIdx) in headers"
                             :key="colIdx"
                         >
-                            <span class="col-header" v-if="editingHeader !== colIdx" @click="editColHeader(colIdx)">
-                                {{ header }}
-                            </span>
-                            <input
-                                v-else
-                                class="col-header border border-black"
-                                type="text"
-                                v-model="headers[colIdx]"
-                                @blur="escEditCell"
-                                @keyup.enter="escEditCell"
-                            />
-                            <input class="ml-2" type="checkbox" v-model="selectedCols[colIdx]" />
+                            <div class="flex items-center w-full">
+                                <span class="col-header flex-grow truncate" v-if="editingHeader !== colIdx" @click="editColHeader(colIdx)">
+                                    {{ header || $t('editor.untitled') }}
+                                </span>
+                                <input
+                                    v-else
+                                    class="col-header flex-grow w-0 max-w-[80%] box-border border border-black p-1"
+                                    type="text"
+                                    v-model="headers[colIdx]"
+                                    @blur="escEditCell"
+                                    @keyup.enter="escEditCell"
+                                />
+                                <input class="ml-2" type="checkbox" v-model="selectedCols[colIdx]" />
+                            </div>
                         </th>
                     </tr>
                 </thead>
@@ -87,26 +89,30 @@
                             <input type="checkbox" v-model="selectedRows[rowIdx]" />
                         </td>
                         <td
-                            class="border border-gray-400 p-2 text-left align-middle"
+                            class="grid-cell border border-gray-400 p-2 text-left align-middle"
                             v-for="(value, colIdx) in row"
                             :key="colIdx"
+                            @click="editCell(rowIdx, colIdx, value)"
                         >
-                            <span
-                                class="grid-cell"
-                                v-if="editingCell.rowIdx !== rowIdx || editingCell.colIdx !== colIdx"
-                                @click="editCell(rowIdx, colIdx, value)"
-                            >
-                                {{ value }}
-                            </span>
-                            <input
-                                v-else
-                                class="grid-cell border border-black w-full"
-                                type="text"
-                                v-model="editingVal"
-                                @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
-                                @blur="escEditCell"
-                                @keyup.enter="escEditCell"
-                            />
+                            <div class="flex items-center w-full">
+                                <span
+                                    class="grid-cell flex-grow truncate"
+                                    v-if="editingCell.rowIdx !== rowIdx || editingCell.colIdx !== colIdx"
+                                    @click="editCell(rowIdx, colIdx, value)"
+                                >
+                                    {{ value }}
+                                </span>
+
+                                <input
+                                    v-else
+                                    class="grid-cell flex-grow w-0 max-w-[80%] box-border border border-black p-1"
+                                    type="text"
+                                    v-model="editingVal"
+                                    @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
+                                    @blur="escEditCell"
+                                    @keyup.enter="escEditCell"
+                                />
+                            </div>
                         </td>
                     </tr>
                 </tbody>
@@ -218,10 +224,12 @@ const handleMouseClick = (event: MouseEvent): void => {
 };
 
 const editColHeader = (colIdx: number) => {
+    escEditCell();
     editingHeader.value = colIdx;
 };
 
 const editCell = (rowIdx: number, colIdx: number, val: string) => {
+    escEditCell();
     editingCell.value = { rowIdx: rowIdx, colIdx: colIdx };
     editingVal.value = val;
 };
