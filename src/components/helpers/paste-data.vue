@@ -4,8 +4,9 @@
         <div class="mt-2">{{ $t('editor.data.paste.description') }}</div>
 
         <textarea
-            class="paste-box border border-black h-2/3 w-full mt-4"
+            class="paste-box border border-black h-2/3 w-full mt-4 p-2"
             :placeholder="$t('editor.data.paste.placeholder')"
+            @keydown="handleKeyDown"
             v-model="pastedData"
         ></textarea>
 
@@ -35,7 +36,9 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
+import { useVfm } from 'vue-final-modal'
 
+const vfm = useVfm();
 const emit = defineEmits(['import']);
 
 const props = defineProps({
@@ -49,6 +52,17 @@ const pastedData = ref<string>('');
 onMounted(() => {
     pastedData.value = props.pastedData || '';
 });
+
+// handle various key combination events
+const handleKeyDown = (event: KeyboardEvent): void => {
+    if (event.key === 'Enter' && event.ctrlKey) {
+        emit('import', pastedData.value);
+        vfm.close('paste-data');
+    } else if (event.key === 'Enter' && event.shiftKey) {
+        event.preventDefault();
+        pastedData.value += '\n';
+    }
+};
 </script>
 <style lang="scss">
 .paste-box {
