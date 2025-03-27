@@ -4,7 +4,8 @@ export const useDataStore = defineStore('chartData', {
     state: () => ({
         headers: [] as string[],
         gridData: [] as string[][],
-        uploaded: false
+        uploaded: false,
+        datatableView: false
     }),
     actions: {
         /* Initially set column headers **/
@@ -14,6 +15,10 @@ export const useDataStore = defineStore('chartData', {
         /* Initially set grid data when uploaded new file **/
         setGridData(data: string[][]) {
             this.gridData = data;
+        },
+        /* **/
+        setDatatableView(datatableView: boolean) {
+            this.datatableView = datatableView;
         },
         /* Set flag if user has uploaded valid chart data format **/
         toggleUploaded(uploaded: boolean) {
