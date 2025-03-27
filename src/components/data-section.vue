@@ -1,7 +1,7 @@
 <template>
     <div class="data-section m-6">
         <div class="text-2xl font-bold">{{ $t('editor.data.title') }}</div>
-        <template v-if="!datatableView">
+        <template v-if="!dataStore.datatableView">
             <div class="mt-4">{{ $t('editor.data.description') }}</div>
 
             <!-- drag and drop section for importing data file -->
@@ -73,7 +73,7 @@
                     :class="{ 'disabled hover:bg-gray-400': !fileName }"
                     :disabled="!fileName"
                     @click="() => {
-                        datatableView = true;
+                        dataStore.setDatatableView(true);
                         dataStore.toggleUploaded(true);
                     }"
                 >
@@ -104,7 +104,7 @@
                 :pastedFile="pastedData"
                 @back="
                     () => {
-                        datatableView = false;
+                        dataStore.setDatatableView(false);
                         dataStore.toggleUploaded(false);
                     }
                 "
@@ -125,14 +125,13 @@ const dataStore = useDataStore();
 
 const dataFile = ref<File | undefined>(undefined);
 const fileName = ref<string>('');
-const datatableView = ref<boolean>(false);
 const pastedData = ref<string>('');
 
 const fileInput = ref<HTMLInputElement | null>(null);
 
 onMounted(() => {
     if (dataStore.gridData && dataStore.gridData.length) {
-        datatableView.value = true;
+        dataStore.setDatatableView(true);
     }
 });
 
@@ -151,7 +150,7 @@ const uploadFile = (event: DragEvent) => {
 
 const parsePastedData = (content: string) => {
     pastedData.value = content;
-    datatableView.value = true;
+    dataStore.setDatatableView(true);
     dataStore.toggleUploaded(true);
 };
 </script>

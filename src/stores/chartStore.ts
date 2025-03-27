@@ -12,6 +12,10 @@ export const useChartStore = defineStore('chartProperties', {
         setChartType(chartType: string) {
             this.chartType = chartType;
         },
+        /* Set highcharts config (from imported json file) **/
+        setChartConfig(chartConfig: HighchartsConfig) {
+            this.chartConfig = chartConfig;
+        },
         /* Setup highcharts configuration for line chart **/
         setupLineChart(seriesNames: string[], cats: string[], seriesData: number[]) {
             this.chartConfig = {

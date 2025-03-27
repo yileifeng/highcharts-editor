@@ -69,7 +69,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded }"
+                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
                     :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
@@ -115,7 +115,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded }"
+                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
                     :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',
@@ -147,6 +147,7 @@
         <div v-if="expanded">
             <button
                 class="flex bg-black text-white justify-center border border-black w-full hover:bg-gray-400 font-bold px-4 py-2 my-2"
+                @click="uploadHighchartsConfig"
             >
                 <svg
                     class="flex-shrink-0 mr-1"
@@ -165,8 +166,12 @@
                 </svg>
                 {{ $t('editor.toc.importChart') }}
             </button>
+            <input ref="highchartsInput" type="file" accept=".json" class="hidden" @change="handleConfigFileUpload" />
             <button
                 class="flex bg-white justify-center border border-black w-full hover:bg-gray-100 font-bold px-4 py-2 my-2"
+                :class="{ 'disabled hover:bg-gray-400': Object.keys(chartStore.chartConfig).length === 0 }"
+                :disabled="Object.keys(chartStore.chartConfig).length === 0"
+                @click="exportHighchartsConfig"
             >
                 <svg
                     class="flex-shrink-0"
@@ -176,21 +181,16 @@
                     stroke="#000000"
                     viewBox="0 0 24 24"
                 >
-                    <path
-                        d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12"
-                        stroke-width="2"
-                        stroke-linecap="round"
-                    ></path>
+                    <path d="M6 21H18M12 3V17M12 17L17 12M12 17L7 12" stroke-width="2" stroke-linecap="round"></path>
                 </svg>
                 {{ $t('editor.toc.exportConfig') }}
             </button>
 
-            <!-- Fried egg -->
             <a
                 class="absolute right-2 bottom-2"
                 href="https://www.youtube.com/watch?v=zzk0VQ0dVMU&feature=youtu.be"
                 target="_blank"
-                v-if="chartStore.chartConfig && chartStore.chartConfig.title?.text.toLowerCase() === 'easteregg'"
+                v-if="chartStore.chartConfig && chartStore.chartConfig.title?.text.toLowerCase() === 'breakfast'"
             >
                 <svg width="24" height="24" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" fill="#000000">
                     <g id="SVGRepo_iconCarrier">
@@ -219,6 +219,8 @@
 import { computed, ref } from 'vue';
 import { useDataStore } from '../stores/dataStore';
 import { useChartStore } from '../stores/chartStore';
+import { saveAs } from 'file-saver';
+import { HighchartsConfig } from '../definitions';
 
 const chartStore = useChartStore();
 
@@ -231,7 +233,65 @@ defineProps({
 const dataStore = useDataStore();
 const uploaded = computed(() => dataStore.uploaded);
 
+const highchartsInput = ref<HTMLInputElement | null>(null);
 const expanded = ref(false);
+
+// upload an existing highcharts configured JSON
+const uploadHighchartsConfig = () => {
+    (highchartsInput.value as HTMLInputElement).click();
+};
+
+// handle uploaded highcharts config file
+const handleConfigFileUpload = (event: Event) => {
+    const configFile = Array.from((event.target as HTMLInputElement).files as ArrayLike<File>)[0];
+    if (!configFile) {
+        return;
+    }
+    // TODO: add file validation
+
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        const res = JSON.parse(e.target?.result as string);
+        console.log('RESULT: ', res);
+        chartStore.setChartConfig(res);
+        // extract data from the config file
+        extractGridData(res);
+    }
+    reader.readAsText(configFile);
+    
+    // clear input
+    (event.target as HTMLInputElement).value = '';
+    dataStore.setDatatableView(true);
+};
+
+// extract grid data from highcharts config file
+const extractGridData = (config: HighchartsConfig) => {
+    if (config.series && Array.isArray(config.series)) {
+        const headers: string[] = config.series.map((series) => series.name);
+        dataStore.setHeaders(headers);
+
+        const gridData: string[][] = [];
+        config.series.forEach((series, colIdx) => {
+            series.data?.forEach((value, rowIdx) => {
+                if (!gridData[rowIdx]) {
+                    gridData[rowIdx] = [];
+                }
+                gridData[rowIdx][colIdx] = value.toString();
+            });
+        });
+        dataStore.setGridData(gridData);
+    } else {
+        console.error('Invalid highcharts config file structure uploaded');
+    }
+};
+
+const exportHighchartsConfig = () => {
+    const filename = `${chartStore.chartConfig.title?.text.toLowerCase()}.json`;
+    // stringify + create blob for exported config
+    const json = JSON.stringify(chartStore.chartConfig, null, 2);
+    const blob = new Blob([json], { type: 'application/json' });
+    saveAs(blob, filename);
+};
 </script>
 
 <style lang="scss">
