@@ -4,20 +4,26 @@ import { HighchartsConfig } from '../definitions';
 export const useChartStore = defineStore('chartProperties', {
     state: () => ({
         chartType: 'line' as string,
+        hybridChartType: 'none' as string,
         chartSeries: [] as string[],
-        chartConfig: {} as HighchartsConfig
+        chartConfig: {} as HighchartsConfig,
+        defaultColours: ['#2caffe', '#f45b5b', '#91e8e1', '#8d4654']
     }),
     actions: {
         /* Set highcharts type **/
         setChartType(chartType: string) {
             this.chartType = chartType;
         },
+        /* Set hybrid highcharts type **/
+        setHybridChartType(chartType: string) {
+            this.hybridChartType = chartType;
+        },
         /* Set highcharts config (from imported json file) **/
         setChartConfig(chartConfig: HighchartsConfig) {
             this.chartConfig = chartConfig;
         },
         /* Setup highcharts configuration for line chart **/
-        setupLineChart(seriesNames: string[], cats: string[], seriesData: number[]) {
+        setupLineChart(seriesNames: string[], cats: string[], seriesData: number[][]) {
             this.chartConfig = {
                 title: {
                     text: 'Line Chart'
@@ -36,23 +42,21 @@ export const useChartStore = defineStore('chartProperties', {
                         text: ''
                     }
                 },
-                series: [
-                    {
-                        name: seriesNames[0],
-                        type: 'line',
-                        color: '#2caffe',
-                        dashStyle: 'solid',
-                        marker: {
-                            symbol: 'circle'
-                        },
-                        data: seriesData
-                    }
-                ]
+                series: seriesNames.map((name, index) => ({
+                    name,
+                    type: 'line',
+                    color: this.defaultColours[index],
+                    dashStyle: 'solid',
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: seriesData[index]
+                }))
             };
             console.log('SETTING UP LINE CHART: ', this.chartConfig);
         },
         /* Setup highcharts configuration for bar chart **/
-        setupBarChart(seriesNames: string[], cats: string[], seriesData: number[]) {
+        setupBarChart(seriesNames: string[], cats: string[], seriesData: number[][]) {
             this.chartConfig = {
                 title: {
                     text: 'Bar Chart'
@@ -71,23 +75,21 @@ export const useChartStore = defineStore('chartProperties', {
                         text: ''
                     }
                 },
-                series: [
-                    {
-                        name: seriesNames[0],
-                        type: 'bar',
-                        color: '#2caffe',
-                        dashStyle: 'solid',
-                        marker: {
-                            symbol: 'circle'
-                        },
-                        data: seriesData
-                    }
-                ]
+                series: seriesNames.map((name, index) => ({
+                    name: name,
+                    type: 'bar',
+                    color: this.defaultColours[index],
+                    dashStyle: 'solid',
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: seriesData[index]
+                }))
             };
             console.log('SETTING UP BAR CHART: ', this.chartConfig);
         },
         /* Setup highcharts configuration for scatter plot **/
-        setupScatterPlot(seriesNames: string[], seriesData: { x: number; y: number }[] | number[], cats?: string[]) {
+        setupScatterPlot(seriesNames: string[], seriesData: { x: number; y: number }[] | number[][], cats?: string[]) {
             this.chartConfig = {
                 title: {
                     text: 'Scatter Plot'
@@ -106,23 +108,21 @@ export const useChartStore = defineStore('chartProperties', {
                         text: ''
                     }
                 },
-                series: [
-                    {
-                        name: seriesNames[0],
-                        type: 'scatter',
-                        color: '#2caffe',
-                        dashStyle: 'solid',
-                        marker: {
-                            symbol: 'circle'
-                        },
-                        data: seriesData
-                    }
-                ]
+                series: seriesNames.map((name, index) => ({
+                    name: name,
+                    type: 'scatter',
+                    color: this.defaultColours[index],
+                    dashStyle: 'solid',
+                    marker: {
+                        symbol: 'circle'
+                    },
+                    data: seriesData[index]
+                }))
             };
             console.log('CHART CONFIG SCATTER: ', this.chartConfig);
         },
         /* Setup highcharts configuration for column chart **/
-        setupColumnChart(seriesNames: string[], cats: string[], seriesData: number[]) {
+        setupColumnChart(seriesNames: string[], cats: string[], seriesData: number[][]) {
             this.chartConfig = {
                 title: {
                     text: 'Column Chart'
@@ -141,15 +141,13 @@ export const useChartStore = defineStore('chartProperties', {
                         text: ''
                     }
                 },
-                series: [
-                    {
-                        name: seriesNames[0],
-                        type: 'column',
-                        color: '#2caffe',
-                        dashStyle: 'solid',
-                        data: seriesData
-                    }
-                ]
+                series: seriesNames.map((name, index) => ({
+                    name: name,
+                    type: 'column',
+                    color: this.defaultColours[index],
+                    dashStyle: 'solid',
+                    data: seriesData[index]
+                }))
             };
         },
         /* Setup highcharts configuration for pie chart **/
@@ -159,7 +157,6 @@ export const useChartStore = defineStore('chartProperties', {
                 subtitle: {
                     text: ''
                 },
-                colors: [],
                 series: [
                     {
                         name: seriesNames[0],
@@ -168,6 +165,22 @@ export const useChartStore = defineStore('chartProperties', {
                     }
                 ]
             };
+        },
+        setupHybridChart(hybridSeries: string[], hybridType: string) {
+            this.setHybridChartType(hybridType);
+            this.chartConfig.series.forEach((series, index) => {
+                if (hybridSeries.includes(series.name)) {
+                    // TODO: may need to adjust based on what hybrid options become available in the future
+                    const baseConfig = {
+                        name: series.name,
+                        type: hybridType,
+                        color: series.color,
+                        dashStyle: 'solid',
+                        data: series.data
+                    };
+                    this.chartConfig.series[index] = { ...baseConfig, ...(hybridType === 'line' || hybridType === 'scatter' ? { marker: { symbol: 'circle' } } : {}) };
+                }
+            });
         }
     }
 });

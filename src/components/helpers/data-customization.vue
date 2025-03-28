@@ -17,10 +17,7 @@
         <h2 class="font-bold mt-6">{{ $t('editor.customization.data.format') }}</h2>
         <div class="mt-4">{{ $t('editor.customization.data.seriesType') }}</div>
         <div class="relative w-1/6 mt-2">
-            <select
-                class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
-                v-model="chartType"
-            >
+            <select class="border border-black w-full p-2 rounded appearance-none cursor-pointer" v-model="chartType">
                 <option v-for="series in Object.keys(seriesOptions)" :key="series" :value="series">
                     {{ $t(`editor.customization.data.series.${series}`) }}
                 </option>
@@ -33,12 +30,7 @@
             <div class="flex flex-col w-1/6 mt-2">
                 <div
                     class="colour-dropdown w-full rounded border border-gray-500 flex items-center justify-between cursor-pointer"
-                    @click="
-                        () => {
-                            showColourPicker = !showColourPicker;
-                            console.log(showColourPicker);
-                        }
-                    "
+                    @click="() => (showColourPicker = !showColourPicker)"
                     @keypress.enter="() => (showColourPicker = !showColourPicker)"
                     tabindex="0"
                 >

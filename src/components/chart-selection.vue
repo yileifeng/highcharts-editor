@@ -1,26 +1,110 @@
 <template>
     <div class="chart-selection m-6">
         <div class="text-2xl font-bold">{{ $t('editor.selection.title') }}</div>
-        <div class="font-bold mt-6">{{ $t('editor.selection.template') }}</div>
-        <select class="border border-black w-2/3 mt-2 p-2 rounded" v-model="chartType" @change="handleChartSelection()">
-            <option v-for="template in Object.keys(chartTemplates)" :key="template" :value="template">
-                {{ $t(`editor.selection.${template}`) }}
-            </option>
-        </select>
 
+        <!-- Main chart type selection (if only one chart type) -->
+        <div class="font-bold mt-6">
+            {{ enableHybrid ? $t('editor.selection.template1') : $t('editor.selection.template') }}
+            <span class="text-red-500" v-if="enableHybrid">{{ $t('editor.customization.required') }}</span>
+        </div>
+        <div class="relative w-1/2 mt-2">
+            <select
+                class="border border-black w-full mt-2 p-2 rounded"
+                v-model="chartType"
+                @change="handleChartSelection"
+            >
+                <option v-for="template in Object.keys(chartTemplates)" :key="template" :value="template">
+                    {{ $t(`editor.selection.${template}`) }}
+                </option>
+            </select>
+            <div class="select-arrow absolute right-2 top-1/2"></div>
+        </div>
+
+        <!-- Second chart type selection for hybrid charts -->
+        <div v-if="enableHybrid">
+            <div class="font-bold mt-6">
+                {{ $t('editor.selection.template2') }}
+                <span class="font-normal">{{ $t('editor.customization.optional') }}</span>
+            </div>
+            <div class="relative w-1/2 mt-2">
+                <select
+                    class="border border-black w-full mt-2 p-2 rounded"
+                    v-model="hybridChartType"
+                    @change="handleHybridSelection"
+                >
+                    <option v-for="template in Object.keys(hybridChartTemplates)" :key="template" :value="template">
+                        {{ $t(`editor.selection.${template}`) }}
+                    </option>
+                </select>
+                <div class="select-arrow absolute right-2 top-1/2"></div>
+            </div>
+        </div>
+
+        <!-- Select which data series belongs to second chart type -->
+        <div v-if="enableMultiselect && chartType !== hybridChartType && hybridChartType !== 'none'">
+            <div class="font-bold mt-6">{{ $t('editor.selection.multiseries') }}</div>
+            <div class="flex flex-col w-1/2 mt-2" v-if="Array.isArray(chartConfig.series)">
+                <div
+                    class="flex border border-black w-full h-[40px] rounded items-center justify-between cursor-pointer"
+                    @click="openMultiSelect = !openMultiSelect"
+                >
+                    <div class="flex w-full h-full">
+                        <div class="flex items-center" v-if="selectedHybridSeries.length">
+                            <span
+                                v-for="(series, index) in selectedHybridSeries"
+                                :key="index"
+                                :class="{ 'ml-2': index === 0 }"
+                            >
+                                {{ series }}<span v-if="index !== selectedHybridSeries.length - 1">,</span>
+                            </span>
+                        </div>
+                        <div class="flex items-center justify-center pr-2 ml-auto">
+                            <span class="select-arrow"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div
+                    v-if="openMultiSelect"
+                    class="flex flex-col border border-black rounded w-full bg-white rounded-md shadow-sm"
+                >
+                    <div
+                        v-for="(series, index) in chartConfig.series"
+                        :key="series.name"
+                        class="p-2 cursor-pointer hover:bg-gray-200"
+                        @click="toggleHybridSeries(series.name)"
+                    >
+                        <input
+                            type="checkbox"
+                            :value="index"
+                            :checked="selectedHybridSeries.includes(series.name)"
+                            :disabled="
+                                selectedHybridSeries.length >= chartConfig.series.length - 1 &&
+                                !selectedHybridSeries.includes(series.name)
+                            "
+                        />
+                        <span class="ml-2">{{ series.name }}</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Preview of chart -->
         <div v-if="!loading">
             <div class="font-bold mt-6">{{ $t('editor.preview') }}</div>
-            <!-- Preview of chart -->
             <div class="dv-chart-container items-stretch h-full w-full mt-2">
                 <highchart :options="chartConfig"></highchart>
             </div>
         </div>
 
-        <router-link class="flex items-center mt-4" :to="{ name: 'Customization' }">
-            <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
-                {{ $t('editor.customization.title') }}
-            </button>
-        </router-link>
+        <!-- Navigate to customization page -->
+        <div class="flex items-center mt-4">
+            <router-link class="p-4 ml-auto" :to="{ name: 'Customization' }">
+                <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
+                    {{ $t('editor.customization.title') }}
+                </button>
+            </router-link>
+        </div>
     </div>
 </template>
 
@@ -40,7 +124,18 @@ const chartConfig = computed(() => chartStore.chartConfig);
 const dataStore = useDataStore();
 const seriesNames = computed(() => Object.values(dataStore.headers).slice(1));
 
+const enableHybrid = computed(() => {
+    return Array.isArray(chartConfig.value.series) && chartConfig.value.series.length >= 2;
+});
+
+const enableMultiselect = computed(() => {
+    return Array.isArray(chartConfig.value.series) && chartConfig.value.series.length > 2;
+});
+
 const chartType = ref<string>('');
+const hybridChartType = ref<string>('');
+const openMultiSelect = ref<boolean>(false);
+
 const chartTemplates: Record<string, string> = {
     bar: 'bar',
     column: 'column',
@@ -48,19 +143,36 @@ const chartTemplates: Record<string, string> = {
     scatter: 'scatter',
     pie: 'pie'
 };
+const hybridChartTemplates: Record<string, string> = {
+    none: 'none',
+    column: 'column',
+    line: 'line',
+    scatter: 'scatter'
+};
+
+let selectedHybridSeries = ref<string[]>([]);
 
 const loading = ref<boolean>(true);
 onMounted(() => {
     chartType.value = chartStore.chartType ? chartStore.chartType : 'line';
+    // default hybrid type to the same as main chart
+    if (enableHybrid.value) {
+        hybridChartType.value = chartStore.hybridChartType ? chartStore.hybridChartType : 'none';
+    }
     handleChartSelection();
 });
 
 const handleChartSelection = (): void => {
+    // TODO: modify logic to avoid wiping hybrid charts in place
+    loading.value = true;
+    const otherSeries = enableMultiselect.value ? selectedHybridSeries.value : [seriesNames.value[1]];
     switch (chartType.value) {
         case chartTemplates.bar: {
             chartStore.setChartType('bar');
             const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+            const seriesData = dataStore.headers
+                .slice(1)
+                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
 
             chartStore.setupBarChart(seriesNames.value, categories, seriesData);
             break;
@@ -68,7 +180,9 @@ const handleChartSelection = (): void => {
         case chartTemplates.column: {
             chartStore.setChartType('column');
             const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+            const seriesData = dataStore.headers
+                .slice(1)
+                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
 
             chartStore.setupColumnChart(seriesNames.value, categories, seriesData);
             break;
@@ -76,7 +190,9 @@ const handleChartSelection = (): void => {
         case chartTemplates.line: {
             chartStore.setChartType('line');
             const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+            const seriesData = dataStore.headers
+                .slice(1)
+                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
 
             chartStore.setupLineChart(seriesNames.value, categories, seriesData);
             break;
@@ -93,7 +209,9 @@ const handleChartSelection = (): void => {
                 chartStore.setupScatterPlot(seriesNames.value, seriesData);
             } else {
                 const categories = dataStore.gridData.map((row) => row[0]);
-                const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
+                const seriesData = dataStore.headers
+                    .slice(1)
+                    .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
                 chartStore.setupScatterPlot(seriesNames.value, seriesData, categories);
             }
 
@@ -110,8 +228,48 @@ const handleChartSelection = (): void => {
             break;
         }
     }
-    loading.value = false;
+
+    if (enableHybrid.value && hybridChartType.value === chartType.value) {
+        chartStore.setHybridChartType('');
+    }
+
+    setTimeout(() => {
+        loading.value = false;
+    }, 100);
+};
+
+// modify the chart config to adapt to hybrid chart setup
+const handleHybridSelection = (): void => {
+    if (hybridChartType.value !== chartType.value) {
+        const hybridSeries = enableMultiselect.value ? selectedHybridSeries.value : [seriesNames.value[1]];
+        chartStore.setupHybridChart(hybridSeries, hybridChartType.value);
+    }
+};
+
+// add selected series to hybrid chart
+const toggleHybridSeries = (series: string): void => {
+    if (selectedHybridSeries.value.includes(series)) {
+        selectedHybridSeries.value = selectedHybridSeries.value.filter(item => item !== series);
+    } else {
+        selectedHybridSeries.value.push(series);
+    }
+    handleHybridSelection();
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.select-arrow {
+    width: 0;
+    height: 0;
+    border-left: 6px solid transparent;
+    border-right: 6px solid transparent;
+    border-top: 6px solid black; /* Standard dropdown arrow */
+}
+
+select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background: none; /* Remove default background */
+}
+</style>

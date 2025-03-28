@@ -69,7 +69,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
+                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
                     :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
@@ -115,7 +115,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
+                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
                     :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',

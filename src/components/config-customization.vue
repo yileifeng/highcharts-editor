@@ -41,7 +41,19 @@
         </template>
 
         <!-- Custom JSON editor -->
-        <template v-else> TODO: add JSON editor + validation </template>
+        <template v-else>
+            <!-- <json-editor
+                v-model="updatedConfig"
+                lang="en"
+                :mode="'text'"
+                :show-btns="false"
+                :expandedOnStart="true"
+                @has-error="(err: string) => { jsonError = err; validate()}"
+                @json-change="
+                    (json: any) => onJsonChange(json)
+                "
+            ></json-editor> -->
+        </template>
 
         <!-- Highcharts preview -->
         <div class="font-bold mt-6">{{ $t('editor.preview') }}</div>
@@ -68,7 +80,8 @@ dataModule(Highcharts);
 const chartStore = useChartStore();
 const chartConfig = computed(() => chartStore.chartConfig);
 
-const sections = ['chartTitles', 'dataSeries', 'axes', 'advanced'];
+// add back 'advanced' after json editor implemented
+const sections = ['chartTitles', 'dataSeries', 'axes'];
 // default to chart titles
 const activeSection = ref<string>('chartTitles');
 </script>
