@@ -1,13 +1,14 @@
 <template>
-    <div class="chart-customization-title">
-        <div class="mt-6">{{ $t('editor.customization.dataSeries') }}</div>
-        <div class="relative w-1/5 mt-2">
+    <div class="graph-customization">
+        <slot></slot>
+        <div class="font-bold mt-6">{{ $t('editor.customization.dataSeries') }}</div>
+        <div class="relative mt-2" :class="hybrid ? 'w-2/3' : 'w-1/5'">
             <select
                 class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                 v-model="activeDataSeries"
             >
                 <!-- Enable insert when exactly one row is selected, enable delete when any number of rows are selected -->
-                <option v-for="series in Object.values(headers.slice(1))" :key="series" :value="series">
+                <option v-for="series in dataSeries" :value="series">
                     {{ series }}
                 </option>
             </select>
@@ -15,26 +16,40 @@
         </div>
 
         <h2 class="font-bold mt-6">{{ $t('editor.customization.data.format') }}</h2>
-        <div class="mt-4">{{ $t('editor.customization.data.seriesType') }}</div>
-        <div class="relative w-1/6 mt-2">
-            <select class="border border-black w-full p-2 rounded appearance-none cursor-pointer" v-model="chartType">
-                <option v-for="series in Object.keys(seriesOptions)" :key="series" :value="series">
-                    {{ $t(`editor.customization.data.series.${series}`) }}
-                </option>
-            </select>
-            <div class="select-arrow absolute right-2 top-1/2"></div>
+        <div class="font-bold mt-4">{{ $t('editor.customization.data.seriesType') }}</div>
+        <div class="relative mt-2" :class="hybrid ? 'w-1/2' : 'w-1/6'">
+            <input
+                disabled
+                type="text"
+                class="border border-black w-full p-2 rounded bg-white"
+                :value="chartType"
+                v-if="hybrid"
+            />
+            <!-- TODO: decide if should allow changing series type in hybrid customization - may lead to complications -->
+            <div v-else>
+                <select
+                    class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
+                    v-model="chartType"
+                    @change="changeChartType"
+                >
+                    <option v-for="series in Object.keys(seriesOptions)" :key="series" :value="series">
+                        {{ $t(`editor.customization.data.series.${series}`) }}
+                    </option>
+                </select>
+                <div class="select-arrow absolute right-2 top-1/2"></div>
+            </div>
         </div>
 
         <div v-if="chartType !== 'pie'">
-            <div class="mt-4">{{ $t('editor.customization.data.colour') }}</div>
-            <div class="flex flex-col w-1/6 mt-2">
+            <div class="font-bold mt-4">{{ $t('editor.customization.data.colour') }}</div>
+            <div class="flex flex-col mt-2" :class="hybrid ? 'w-1/2' : 'w-1/6'">
                 <div
                     class="colour-dropdown w-full rounded border border-gray-500 flex items-center justify-between cursor-pointer"
                     @click="() => (showColourPicker = !showColourPicker)"
                     @keypress.enter="() => (showColourPicker = !showColourPicker)"
                     tabindex="0"
                 >
-                    <div class="flex w-full h-full">
+                    <div class="flex w-full h-full bg-white rounded">
                         <div
                             class="rounded border-r border-gray-400 w-10"
                             tabindex="0"
@@ -62,8 +77,8 @@
                 </div>
             </div>
 
-            <div class="mt-4">{{ $t('editor.customization.data.dashStyle') }}</div>
-            <div class="relative w-1/6 mt-2">
+            <div class="font-bold mt-4">{{ $t('editor.customization.data.dashStyle') }}</div>
+            <div class="relative mt-2" :class="hybrid ? 'w-1/2' : 'w-1/6'">
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="(activeSeries as SeriesData).dashStyle"
@@ -75,8 +90,8 @@
                 <div class="select-arrow absolute right-2 top-1/2"></div>
             </div>
 
-            <div class="mt-4">{{ $t('editor.customization.data.pointMarker') }}</div>
-            <div class="relative w-1/6 mt-2">
+            <div class="font-bold mt-4">{{ $t('editor.customization.data.pointMarker') }}</div>
+            <div class="relative mt-2" :class="hybrid ? 'w-1/2' : 'w-1/6'">
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="(activeSeries as SeriesData).marker!.symbol"
@@ -93,16 +108,31 @@
 
 <script setup lang="ts">
 import { computed, onBeforeMount, ref } from 'vue';
-import { useChartStore } from '../../stores/chartStore';
 import { useDataStore } from '../../stores/dataStore';
+import { useChartStore } from '../../stores/chartStore';
 import { SeriesData } from '../../definitions';
 
+const props = defineProps({
+    dataSeries: {
+        type: Array<string>,
+        required: true
+    },
+    chartType: {
+        type: String,
+        required: true
+    },
+    hybrid: {
+        type: Boolean,
+        default: false
+    }
+});
+
+const emit = defineEmits(['loading']);
+
+const dataStore = useDataStore();
 const chartStore = useChartStore();
 const chartConfig = computed(() => chartStore.chartConfig);
-const defaultChartType = computed(() => chartStore.chartType);
-const dataStore = useDataStore();
 
-const headers = computed(() => dataStore.headers);
 const activeDataSeries = ref<string>('');
 const activeSeries = computed(() => {
     if (Array.isArray(chartConfig.value.series)) {
@@ -111,11 +141,9 @@ const activeSeries = computed(() => {
         return chartConfig.value.series;
     }
 });
-const chartType = ref<string>('');
 const showColourPicker = ref<boolean>(false);
-// const dataColour = ref<string>('#1f2937');
-// const dataDashStyle = ref<string>('solid');
-// const dataPointMarker = ref<string>('circle');
+
+const chartType = ref<string>('');
 
 const seriesOptions: Record<string, string> = {
     bar: 'bar',
@@ -138,12 +166,22 @@ const markerOptions: Record<string, string> = {
 };
 
 onBeforeMount(() => {
-    activeDataSeries.value = Object.values(headers.value)[1];
-    chartType.value = defaultChartType.value;
+    activeDataSeries.value = props.dataSeries[0];
+    chartType.value = (activeSeries.value as SeriesData).type;
 });
 
 const updateColour = (eventData: any) => {
     (activeSeries.value as SeriesData).color = eventData.cssColor;
+};
+
+const changeChartType = () => {
+    emit('loading', true);
+    const seriesNames = Object.values(dataStore.headers).slice(1);
+    chartStore.updateConfig(chartType.value, seriesNames, dataStore.headers, dataStore.gridData);
+    // set brief timeout to allow chart to re-render
+    setTimeout(() => {
+        emit('loading', false);
+    }, 100);
 };
 </script>
 
@@ -163,13 +201,14 @@ const updateColour = (eventData: any) => {
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid black; /* Standard dropdown arrow */
+    border-top: 6px solid black;
 }
 
 select {
+    background-color: white !important;
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background: none; /* Remove default background */
+    background: none;
 }
 </style>

@@ -54,6 +54,7 @@ editor.customization.title,Customize Chart,1,Personnaliser le Graphique,0
 editor.customization.chartTitles,Chart titles,1,Titres des graphiques,0
 editor.customization.dataSeries,Data series,1,Série de données,0
 editor.customization.axes,Axes,1,Axes,0
+editor.customization.axes.na,No axes available for this chart type,1,Aucun axe disponible pour ce type de graphique,0
 editor.customization.required,(required),1,(obligatoire),0
 editor.customization.optional,(optional),1,(facultatif),0
 editor.customization.titles.chart,Chart title,1,Titre du graphique,0

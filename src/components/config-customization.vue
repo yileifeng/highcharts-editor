@@ -1,5 +1,5 @@
 <template>
-    <div class="chart-customization m-6">
+    <div class="chart-customization m-6" v-if="Object.keys(chartConfig).length">
         <div class="text-2xl font-bold">{{ $t('editor.customization.title') }}</div>
         <!-- header nav section for customization options -->
         <div class="mt-8 w-1/2">
@@ -32,7 +32,30 @@
 
         <!-- Customize chart data options -->
         <template v-else-if="activeSection === 'dataSeries'">
-            <data-customization />
+            <div
+                class="flex mt-4"
+                v-if="chartStore.hybridChartType && chartStore.hybridChartType !== chartStore.chartType"
+            >
+                <data-customization
+                    :dataSeries="mainDataSeries"
+                    :hybrid="true"
+                    :chartType="chartStore.chartType"
+                    class="bg-gray-200 rounded p-4 pb-8 mr-16 w-1/3"
+                >
+                    <h2 class="font-bold mb-4">{{ $t('editor.graph', { num: 1 }) }}</h2>
+                </data-customization>
+
+                <data-customization
+                    :dataSeries="hybridDataSeries"
+                    :hybrid="true"
+                    :chartType="chartStore.hybridChartType"
+                    class="bg-gray-200 rounded p-4 pb-8 mr-16 w-1/3"
+                >
+                    <h2 class="font-bold mb-4">{{ $t('editor.graph', { num: 2 }) }}</h2>
+                </data-customization>
+            </div>
+
+            <data-customization :dataSeries="mainDataSeries" :chartType="chartStore.chartType" @loading="(val) => loading = val" v-else />
         </template>
 
         <!-- Configure chart axes -->
@@ -55,22 +78,26 @@
             ></json-editor> -->
         </template>
 
-        <!-- Highcharts preview -->
-        <div class="font-bold mt-6">{{ $t('editor.preview') }}</div>
-        <!-- Preview of chart -->
-        <div class="dv-chart-container items-stretch h-full w-full mt-2">
-            <highchart :options="chartConfig"></highchart>
+        <div v-if="!loading">
+            <!-- Highcharts preview -->
+            <div class="font-bold mt-6">{{ $t('editor.preview') }}</div>
+            <!-- Preview of chart -->
+            <div class="dv-chart-container items-stretch h-full w-full mt-2">
+                <highchart :options="chartConfig"></highchart>
+            </div>
         </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, ref } from 'vue';
+import { computed, ref, onBeforeMount } from 'vue';
+import { useRouter } from 'vue-router';
 import { useChartStore } from '../stores/chartStore';
+import { SeriesData } from '../definitions';
 
-import TitlesCustomization from './helpers/titles-customization.vue'
-import DataCustomization from './helpers/data-customization.vue'
-import AxesCustomization from './helpers/axes-customization.vue'
+import TitlesCustomization from './helpers/titles-customization.vue';
+import DataCustomization from './helpers/data-customization.vue';
+import AxesCustomization from './helpers/axes-customization.vue';
 
 import Highcharts from 'highcharts';
 import dataModule from 'highcharts/modules/data';
@@ -80,10 +107,40 @@ dataModule(Highcharts);
 const chartStore = useChartStore();
 const chartConfig = computed(() => chartStore.chartConfig);
 
+const router = useRouter();
+
 // add back 'advanced' after json editor implemented
 const sections = ['chartTitles', 'dataSeries', 'axes'];
 // default to chart titles
 const activeSection = ref<string>('chartTitles');
+const loading = ref<boolean>(false);
+
+onBeforeMount(() => {
+    // case of directly accessing page with no data
+    if (Object.keys(chartConfig.value).length === 0) {
+        router.push({ name: 'Data' });
+    }
+});
+
+const mainDataSeries = computed(() => {
+    if (Array.isArray(chartConfig.value.series)) {
+        return (chartConfig.value.series as SeriesData[])
+            .filter((s) => s.type === chartStore.chartType)
+            .map((s) => s.name);
+    } else {
+        return [chartConfig.value.series[0].name];
+    }
+});
+
+const hybridDataSeries = computed(() => {
+    if (chartStore.hybridChartType && chartStore.hybridChartType !== chartStore.chartType) {
+        return (chartConfig.value.series as SeriesData[])
+            .filter((s) => s.type === chartStore.hybridChartType)
+            .map((s) => s.name);
+    } else {
+        return [];
+    }
+});
 </script>
 
 <style lang="scss">

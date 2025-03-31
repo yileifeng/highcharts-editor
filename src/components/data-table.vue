@@ -110,7 +110,11 @@
 
                                 <input
                                     v-else
-                                    :ref="(el) => (gridCellInput[rowIdx * headers.length + colIdx] = el as HTMLInputElement | null)"
+                                    :ref="
+                                        (el) =>
+                                            (gridCellInput[rowIdx * headers.length + colIdx] =
+                                                el as HTMLInputElement | null)
+                                    "
                                     class="grid-cell flex-grow w-0 max-w-[80%] box-border border border-black p-1"
                                     type="text"
                                     v-model="editingVal"
@@ -195,9 +199,7 @@ const colActions: Record<string, string> = {
 };
 
 onMounted(() => {
-    if (gridData && gridData.value.length) {
-        return;
-    } else {
+    if (props.uploadedFile || props.pastedFile) {
         // parse uploaded file or pasted data
         $papa.parse(props.uploadedFile || props.pastedFile, {
             header: true, // first row headers
@@ -211,7 +213,7 @@ onMounted(() => {
                 const seriesData = dataStore.headers
                     .slice(1)
                     .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
-                chartStore.setupLineChart(Object.values(dataStore.headers).slice(1), categories, seriesData);
+                chartStore.setupConfig(Object.values(dataStore.headers).slice(1), categories, seriesData);
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);

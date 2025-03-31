@@ -109,7 +109,8 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onMounted } from 'vue';
+import { computed, ref, onBeforeMount, onMounted } from 'vue';
+import { useRouter } from 'vue-router';
 import { useChartStore } from '../stores/chartStore';
 import { useDataStore } from '../stores/dataStore';
 
@@ -123,6 +124,8 @@ const chartConfig = computed(() => chartStore.chartConfig);
 
 const dataStore = useDataStore();
 const seriesNames = computed(() => Object.values(dataStore.headers).slice(1));
+
+const router = useRouter();
 
 const enableHybrid = computed(() => {
     return Array.isArray(chartConfig.value.series) && chartConfig.value.series.length >= 2;
@@ -153,86 +156,49 @@ const hybridChartTemplates: Record<string, string> = {
 let selectedHybridSeries = ref<string[]>([]);
 
 const loading = ref<boolean>(true);
+
+onBeforeMount(() => {
+    // case of directly accessing page with no data
+    if (Object.keys(chartConfig.value).length === 0) {
+        router.push({ name: 'Data' });
+    }
+});
+
 onMounted(() => {
     chartType.value = chartStore.chartType ? chartStore.chartType : 'line';
     // default hybrid type to the same as main chart
     if (enableHybrid.value) {
         hybridChartType.value = chartStore.hybridChartType ? chartStore.hybridChartType : 'none';
     }
-    handleChartSelection();
+
+    // user manually uploaded existing highcharts config
+    if (Object.keys(chartStore.chartConfig).length) {
+        loading.value = false;
+        return;
+    }
+
+    // construct line chart by default
+    const categories = dataStore.gridData.map((row) => row[0]);
+    const seriesData = dataStore.headers
+        .slice(1)
+        .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
+
+    chartStore.setupConfig(seriesNames.value, categories, seriesData);
 });
 
+// handle chart type selection and update chart config (only called after config has been initialized in mounted)
 const handleChartSelection = (): void => {
-    // TODO: modify logic to avoid wiping hybrid charts in place
     loading.value = true;
     const otherSeries = enableMultiselect.value ? selectedHybridSeries.value : [seriesNames.value[1]];
-    switch (chartType.value) {
-        case chartTemplates.bar: {
-            chartStore.setChartType('bar');
-            const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.headers
-                .slice(1)
-                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
+    const seriesToUpdate = seriesNames.value.filter((name) => !otherSeries.includes(name));
 
-            chartStore.setupBarChart(seriesNames.value, categories, seriesData);
-            break;
-        }
-        case chartTemplates.column: {
-            chartStore.setChartType('column');
-            const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.headers
-                .slice(1)
-                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
-
-            chartStore.setupColumnChart(seriesNames.value, categories, seriesData);
-            break;
-        }
-        case chartTemplates.line: {
-            chartStore.setChartType('line');
-            const categories = dataStore.gridData.map((row) => row[0]);
-            const seriesData = dataStore.headers
-                .slice(1)
-                .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
-
-            chartStore.setupLineChart(seriesNames.value, categories, seriesData);
-            break;
-        }
-        case chartTemplates.scatter: {
-            chartStore.setChartType('scatter');
-            // check if there exist categories (string values as first col) or if data is formatted as points in (x, y)
-            const firstColNumeric = dataStore.gridData.every((row) => !isNaN(parseFloat(row[0])));
-            if (firstColNumeric) {
-                const seriesData = dataStore.gridData.map((row) => ({
-                    x: parseFloat(row[0]),
-                    y: parseFloat(row[1])
-                }));
-                chartStore.setupScatterPlot(seriesNames.value, seriesData);
-            } else {
-                const categories = dataStore.gridData.map((row) => row[0]);
-                const seriesData = dataStore.headers
-                    .slice(1)
-                    .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
-                chartStore.setupScatterPlot(seriesNames.value, seriesData, categories);
-            }
-
-            break;
-        }
-        case chartTemplates.pie: {
-            chartStore.setChartType('pie');
-            const data = dataStore.gridData.map((row) => ({
-                name: row[0],
-                y: parseFloat(row[1])
-            }));
-
-            chartStore.setupPieChart(seriesNames.value, data);
-            break;
-        }
-    }
+    chartStore.updateConfig(chartType.value, seriesToUpdate, dataStore.headers, dataStore.gridData);
 
     if (enableHybrid.value && hybridChartType.value === chartType.value) {
-        chartStore.setHybridChartType('');
+        chartStore.setHybridChartType('none');
     }
 
+    // set brief timeout to allow chart to re-render
     setTimeout(() => {
         loading.value = false;
     }, 100);
@@ -240,36 +206,42 @@ const handleChartSelection = (): void => {
 
 // modify the chart config to adapt to hybrid chart setup
 const handleHybridSelection = (): void => {
-    if (hybridChartType.value !== chartType.value) {
+    if (hybridChartType.value !== chartType.value && hybridChartType.value !== 'none') {
         const hybridSeries = enableMultiselect.value ? selectedHybridSeries.value : [seriesNames.value[1]];
-        chartStore.setupHybridChart(hybridSeries, hybridChartType.value);
+        chartStore.updateHybridChart(hybridSeries, hybridChartType.value);
+    } else {
+        // set all data series to original chart type (case for hybrid chart type being 'none' or same as main chart type)
+        chartStore.setHybridChartType('none');
+        selectedHybridSeries.value = [];
+        handleChartSelection();
     }
 };
 
 // add selected series to hybrid chart
 const toggleHybridSeries = (series: string): void => {
     if (selectedHybridSeries.value.includes(series)) {
-        selectedHybridSeries.value = selectedHybridSeries.value.filter(item => item !== series);
+        selectedHybridSeries.value = selectedHybridSeries.value.filter((item) => item !== series);
     } else {
         selectedHybridSeries.value.push(series);
     }
+    // logic to handle modifying the config
     handleHybridSelection();
 };
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .select-arrow {
     width: 0;
     height: 0;
     border-left: 6px solid transparent;
     border-right: 6px solid transparent;
-    border-top: 6px solid black; /* Standard dropdown arrow */
+    border-top: 6px solid black;
 }
 
 select {
     -webkit-appearance: none;
     -moz-appearance: none;
     appearance: none;
-    background: none; /* Remove default background */
+    background: none;
 }
 </style>

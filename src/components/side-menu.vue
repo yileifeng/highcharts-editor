@@ -252,7 +252,6 @@ const handleConfigFileUpload = (event: Event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
         const res = JSON.parse(e.target?.result as string);
-        console.log('RESULT: ', res);
         chartStore.setChartConfig(res);
         // extract data from the config file
         extractGridData(res);
