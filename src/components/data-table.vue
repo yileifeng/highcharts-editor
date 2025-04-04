@@ -80,6 +80,7 @@
                                     class="col-header flex-grow w-0 max-w-[80%] box-border border border-black p-1"
                                     type="text"
                                     v-model="headers[colIdx]"
+                                    @input="updateHeader(colIdx, headers[colIdx])"
                                     @blur="escEditCell"
                                     @keyup.enter="escEditCell"
                                 />
@@ -266,8 +267,14 @@ const escEditCell = () => {
     editingVal.value = '';
 };
 
+const updateHeader = (headerIdx: number, val: string) => {
+    chartStore.updateHeader(headerIdx, val);
+}
+
 const updateCell = (rowIdx: number, colIdx: number, val: string) => {
     dataStore.updateCell(rowIdx, colIdx, val);
+    // update chart config with new series value
+    chartStore.updateVal(rowIdx, colIdx, val);
 };
 
 const handleRowAction = (): void => {
@@ -275,14 +282,17 @@ const handleRowAction = (): void => {
     switch (rowAction.value) {
         case rowActions.delete: {
             dataStore.deleteRows(rowIdxs);
+            chartStore.deleteRow(rowIdxs.map(rowIdx => parseInt(rowIdx)));
             break;
         }
         case rowActions.insertBelow: {
             dataStore.addNewRow(rowIdxs[0], true);
+            chartStore.insertRow(parseInt(rowIdxs[0]) + 1);
             break;
         }
         case rowActions.insertAbove: {
             dataStore.addNewRow(rowIdxs[0], false);
+            chartStore.insertRow(parseInt(rowIdxs[0]));
             break;
         }
     }
@@ -297,14 +307,17 @@ const handleColAction = (): void => {
     switch (colAction.value) {
         case colActions.delete: {
             dataStore.deleteCols(colIdxs);
+            chartStore.deleteColumn(colIdxs.map(colIdx => parseInt(colIdx)));
             break;
         }
         case colActions.insertRight: {
             dataStore.addNewCol(colIdxs[0], true);
+            chartStore.insertColumn(parseInt(colIdxs[0]) + 1);
             break;
         }
         case colActions.insertLeft: {
             dataStore.addNewCol(colIdxs[0], false);
+            chartStore.insertColumn(parseInt(colIdxs[0]));
             break;
         }
     }

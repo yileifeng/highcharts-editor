@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { HighchartsConfig } from '../definitions';
+import { HighchartsConfig, SeriesData } from '../definitions';
 
 const chartTemplates: Record<string, string> = {
     bar: 'bar',
@@ -20,22 +20,22 @@ export const useChartStore = defineStore('chartProperties', {
 
     actions: {
         /* Set highcharts type **/
-        setChartType(chartType: string) {
+        setChartType(chartType: string): void {
             this.chartType = chartType;
         },
 
         /* Set hybrid highcharts type **/
-        setHybridChartType(chartType: string) {
+        setHybridChartType(chartType: string): void {
             this.hybridChartType = chartType;
         },
 
         /* Set highcharts config (from imported json file) **/
-        setChartConfig(chartConfig: HighchartsConfig) {
+        setChartConfig(chartConfig: HighchartsConfig): void {
             this.chartConfig = chartConfig;
         },
 
         /* Set default highcharts config **/
-        setupConfig(seriesNames: string[], cats: string[], seriesData: number[][]) {
+        setupConfig(seriesNames: string[], cats: string[], seriesData: number[][]): void {
             this.chartConfig = {
                 title: {
                     text: 'Base Chart'
@@ -69,14 +69,14 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for chart type **/
-        updateConfig(type: string, series: string[], headers: string[], gridData: string[][]) {
+        updateConfig(type: string, series: string[], headers: string[], gridData: string[][]): void {
             switch (type) {
                 case chartTemplates.bar: {
                     this.setChartType('bar');
                     const seriesData = headers
                         .slice(1)
                         .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
-        
+
                     this.updateBarChart(series, seriesData);
                     break;
                 }
@@ -85,7 +85,7 @@ export const useChartStore = defineStore('chartProperties', {
                     const seriesData = headers
                         .slice(1)
                         .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
-        
+
                     this.updateColumnChart(series, seriesData);
                     break;
                 }
@@ -94,7 +94,7 @@ export const useChartStore = defineStore('chartProperties', {
                     const seriesData = headers
                         .slice(1)
                         .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
-        
+
                     this.updateLineChart(series, seriesData);
                     break;
                 }
@@ -115,7 +115,7 @@ export const useChartStore = defineStore('chartProperties', {
                             .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
                         this.updateScatterPlot(series, seriesData);
                     }
-        
+
                     break;
                 }
                 case chartTemplates.pie: {
@@ -124,7 +124,7 @@ export const useChartStore = defineStore('chartProperties', {
                         name: row[0],
                         y: parseFloat(row[1])
                     }));
-        
+
                     const seriesNames = Object.values(headers).slice(1);
                     this.updatePieChart(seriesNames, data);
                     break;
@@ -132,8 +132,61 @@ export const useChartStore = defineStore('chartProperties', {
             }
         },
 
+        /* Update data series after deleting row(s) **/
+        deleteRow(rowIdxs: number[]): void {
+            const sortedRowIdxs = [...rowIdxs].sort((a, b) => b - a);
+            // assuming all indices are valid
+            sortedRowIdxs.forEach((rowIdx: number) => {
+                this.chartConfig.xAxis.categories.splice(rowIdx, 1);
+                this.chartConfig.series.forEach((series: SeriesData) => {
+                    series.data?.splice(rowIdx, 1);
+                });
+            });
+        },
+
+        /* Update data series after deleting column(s) **/
+        deleteColumn(colIdxs: number[]): void {
+            const sortedColIdxs = [...colIdxs].sort((a, b) => b - a);
+            sortedColIdxs.forEach((colIdx: number) => {
+                this.chartConfig.series.splice(colIdx, 1);
+            });
+        },
+
+        /* Update data series after inserting row **/
+        insertRow(rowIdx: number): void {
+            this.chartConfig.xAxis.categories.splice(rowIdx, 0, '');
+            this.chartConfig.series.forEach((series: SeriesData) => {
+                series.data?.splice(rowIdx, 0, 0);
+            });
+        },
+
+        /* Update data series after inserting column **/
+        insertColumn(colIdx: number): void {
+            const defaultData = new Array(this.chartConfig.xAxis.categories.length).fill(0);
+            const newSeries: SeriesData = {
+                name: 'Untitled',
+                type: this.chartType,
+                data: defaultData
+            };
+            this.chartConfig.series.splice(colIdx, 0, newSeries);
+        },
+
+        /* Update header (series names) value **/
+        updateHeader(colIdx: number, name: string): void {
+            this.chartConfig.series[colIdx - 1].name = name;
+        },
+
+        /* Update a single series value after data grid cell has been modified **/
+        updateVal(rowIdx: number, colIdx: number, val: string): void {
+            if (colIdx) {
+                this.chartConfig.series[colIdx - 1].data[rowIdx] = parseInt(val);
+            } else {
+                this.chartConfig.xAxis.categories[rowIdx] = val;
+            }
+        },
+
         /* Update highcharts configuration for line chart **/
-        updateLineChart(seriesNames: string[], seriesData: number[][]) {
+        updateLineChart(seriesNames: string[], seriesData: number[][]): void {
             this.chartConfig.series = this.chartConfig.series.map((series, index) =>
                 seriesNames.includes(series.name)
                     ? {
@@ -149,7 +202,7 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for bar chart **/
-        updateBarChart(seriesNames: string[], seriesData: number[][]) {
+        updateBarChart(seriesNames: string[], seriesData: number[][]): void {
             this.chartConfig.series = this.chartConfig.series.map((series, index) =>
                 seriesNames.includes(series.name)
                     ? {
@@ -167,7 +220,11 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for scatter plot **/
-        updateScatterPlot(seriesNames: string[], seriesData: { x: number; y: number }[] | number[][], cats?: string[]) {
+        updateScatterPlot(
+            seriesNames: string[],
+            seriesData: { x: number; y: number }[] | number[][],
+            cats?: string[]
+        ): void {
             // re-initialize chart config for special x y case of scatter plot data
             if (typeof seriesData === 'object') {
                 this.chartConfig = {
@@ -216,7 +273,7 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for column chart **/
-        updateColumnChart(seriesNames: string[], seriesData: number[][]) {
+        updateColumnChart(seriesNames: string[], seriesData: number[][]): void {
             this.chartConfig.series = this.chartConfig.series.map((series, index) =>
                 seriesNames.includes(series.name)
                     ? {
@@ -234,7 +291,7 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for pie chart **/
-        updatePieChart(seriesNames: string[], seriesData: { name: string; y: number }[]) {
+        updatePieChart(seriesNames: string[], seriesData: { name: string; y: number }[]): void {
             // following would support pie chart as part of hybrid charts
             // this.chartConfig.series = this.chartConfig.series.map((series, index) =>
             //     seriesNames.includes(series.name) ? { name: seriesNames[0], type: 'pie', data: seriesData[index] } : series
@@ -255,7 +312,7 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for hybrid chart **/
-        updateHybridChart(hybridSeries: string[], hybridType: string) {
+        updateHybridChart(hybridSeries: string[], hybridType: string): void {
             this.setHybridChartType(hybridType);
             this.chartConfig.series.forEach((series, index) => {
                 if (hybridSeries.includes(series.name)) {
