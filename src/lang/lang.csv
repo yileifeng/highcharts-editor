@@ -6,6 +6,7 @@ editor.title,Highcharts Editor,1,Éditeur de Highcharts,0
 editor.untitled,Untitled,1,Sans titre,0
 editor.expand,Expand,1,Développer,0
 editor.preview,Preview,1,Aperçu,1
+editor.graph,Graph {num},1,Graphique {num},1
 editor.collapse,Collapse,1,Effondrement,0
 editor.save.warning,Chart cannot be saved,1,Le graphique ne peut pas être enregistré,0
 editor.save.warning.text,"In order to save a chart, you must upload data and set your chart name.",1,"Pour enregistrer un graphique, vous devez télécharger des données et définir le nom de votre graphique",0
@@ -40,16 +41,22 @@ editor.datatable.colActions.insertRight,Insert right,1,Insérer à droite,0
 editor.datatable.templates,Choose templates,1,Choisir un modèle,0
 editor.selection.title,Templates,1,Modèles,0
 editor.selection.template,Select chart template,1,Sélectionner un modèle de graphique,0
+editor.selection.template1,Select template for graph 1,1,Sélectionner un modèle pour le graphique 1,0
+editor.selection.template2,Select template for graph 2,1,Sélectionner un modèle pour le graphique 2,0
+editor.selection.multiseries,Select data series for graph 2,1,Sélectionner la série de données pour le graphique 2,0
 editor.selection.bar,Bar chart,1,Graphique à barres,0
 editor.selection.column,Column chart,1,Diagramme à colonnes,0
 editor.selection.line,Line chart,1,Graphique linéaire,0
 editor.selection.scatter,Scatter plot,1,Nuage de points,0
 editor.selection.pie,Pie chart,1,Diagramme circulaire,0
+editor.selection.none,None,1,Aucun,0
 editor.customization.title,Customize Chart,1,Personnaliser le Graphique,0
 editor.customization.chartTitles,Chart titles,1,Titres des graphiques,0
 editor.customization.dataSeries,Data series,1,Série de données,0
 editor.customization.axes,Axes,1,Axes,0
+editor.customization.axes.na,No axes available for this chart type,1,Aucun axe disponible pour ce type de graphique,0
 editor.customization.required,(required),1,(obligatoire),0
+editor.customization.optional,(optional),1,(facultatif),0
 editor.customization.titles.chart,Chart title,1,Titre du graphique,0
 editor.customization.titles.subtitle,Chart sub-title,1,Sous-titre du graphique,0
 editor.customization.titles.placeholder,Untitled chart,1,Graphique sans titre,0

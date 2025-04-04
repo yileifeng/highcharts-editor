@@ -60,21 +60,27 @@
             <table class="table-auto border-collapse border border-black w-full mt-8">
                 <thead>
                     <tr class="bg-gray-200">
-                        <th class="border border-gray-400 p-2 text-left align-middle"></th>
+                        <th class="border border-gray-400 w-16 p-2 text-left align-middle"></th>
                         <th
                             class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(header, colIdx) in headers"
                             :key="colIdx"
                         >
                             <div class="flex items-center w-full">
-                                <span class="col-header flex-grow truncate" v-if="editingHeader !== colIdx" @click="editColHeader(colIdx)">
+                                <span
+                                    class="col-header flex-grow truncate"
+                                    v-if="editingHeader !== colIdx"
+                                    @click="editColHeader(colIdx)"
+                                >
                                     {{ header || $t('editor.untitled') }}
                                 </span>
                                 <input
                                     v-else
+                                    :ref="(el) => (headerInput[colIdx] = el as HTMLInputElement | null)"
                                     class="col-header flex-grow w-0 max-w-[80%] box-border border border-black p-1"
                                     type="text"
                                     v-model="headers[colIdx]"
+                                    @input="updateHeader(colIdx, headers[colIdx])"
                                     @blur="escEditCell"
                                     @keyup.enter="escEditCell"
                                 />
@@ -105,6 +111,11 @@
 
                                 <input
                                     v-else
+                                    :ref="
+                                        (el) =>
+                                            (gridCellInput[rowIdx * headers.length + colIdx] =
+                                                el as HTMLInputElement | null)
+                                    "
                                     class="grid-cell flex-grow w-0 max-w-[80%] box-border border border-black p-1"
                                     type="text"
                                     v-model="editingVal"
@@ -125,16 +136,18 @@
             <highchart :options="chartConfig"></highchart>
         </div>
 
-        <router-link class="flex items-center mt-4" :to="{ name: 'ChartType' }">
-            <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
-                {{ $t('editor.datatable.templates') }}
-            </button>
-        </router-link>
+        <div class="flex items-center mt-4">
+            <router-link class="p-4 ml-auto" :to="{ name: 'ChartType' }">
+                <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
+                    {{ $t('editor.datatable.templates') }}
+                </button>
+            </router-link>
+        </div>
     </div>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, inject, onBeforeUnmount, onMounted } from 'vue';
+import { computed, reactive, ref, inject, onBeforeUnmount, onMounted, nextTick } from 'vue';
 import { useDataStore } from '../stores/dataStore';
 import { useChartStore } from '../stores/chartStore';
 
@@ -162,6 +175,9 @@ const headers = computed(() => dataStore.headers);
 const gridData = computed(() => dataStore.gridData);
 const chartConfig = computed(() => chartStore.chartConfig);
 
+const headerInput = ref<(HTMLInputElement | null)[]>([]);
+const gridCellInput = ref<(HTMLInputElement | null)[]>([]);
+
 const editingHeader = ref(-1);
 const editingCell = ref({ rowIdx: -1, colIdx: -1 });
 const editingVal = ref('');
@@ -184,9 +200,7 @@ const colActions: Record<string, string> = {
 };
 
 onMounted(() => {
-    if (gridData && gridData.value.length) {
-        return;
-    } else {
+    if (props.uploadedFile || props.pastedFile) {
         // parse uploaded file or pasted data
         $papa.parse(props.uploadedFile || props.pastedFile, {
             header: true, // first row headers
@@ -197,8 +211,10 @@ onMounted(() => {
 
                 // default preview of datatable to line graph
                 const categories = dataStore.gridData.map((row) => row[0]);
-                const seriesData = dataStore.gridData.map((row) => parseFloat(row[1]));
-                chartStore.setupLineChart(Object.values(dataStore.headers).slice(1), categories, seriesData);
+                const seriesData = dataStore.headers
+                    .slice(1)
+                    .map((_, colIdx) => dataStore.gridData.map((row) => parseFloat(row[colIdx + 1])));
+                chartStore.setupConfig(Object.values(dataStore.headers).slice(1), categories, seriesData);
             },
             error: (err) => {
                 console.error('Error parsing file: ', err);
@@ -226,12 +242,23 @@ const handleMouseClick = (event: MouseEvent): void => {
 const editColHeader = (colIdx: number) => {
     escEditCell();
     editingHeader.value = colIdx;
+
+    // focus the selected column header
+    nextTick(() => {
+        headerInput.value[colIdx]?.focus();
+    });
 };
 
 const editCell = (rowIdx: number, colIdx: number, val: string) => {
     escEditCell();
     editingCell.value = { rowIdx: rowIdx, colIdx: colIdx };
     editingVal.value = val;
+
+    // focus the selected grid cell input
+    nextTick(() => {
+        const cellIdx = rowIdx * headers.value.length + colIdx;
+        gridCellInput.value[cellIdx]?.focus();
+    });
 };
 
 const escEditCell = () => {
@@ -240,8 +267,14 @@ const escEditCell = () => {
     editingVal.value = '';
 };
 
+const updateHeader = (headerIdx: number, val: string) => {
+    chartStore.updateHeader(headerIdx, val);
+}
+
 const updateCell = (rowIdx: number, colIdx: number, val: string) => {
     dataStore.updateCell(rowIdx, colIdx, val);
+    // update chart config with new series value
+    chartStore.updateVal(rowIdx, colIdx, val);
 };
 
 const handleRowAction = (): void => {
@@ -249,14 +282,17 @@ const handleRowAction = (): void => {
     switch (rowAction.value) {
         case rowActions.delete: {
             dataStore.deleteRows(rowIdxs);
+            chartStore.deleteRow(rowIdxs.map(rowIdx => parseInt(rowIdx)));
             break;
         }
         case rowActions.insertBelow: {
             dataStore.addNewRow(rowIdxs[0], true);
+            chartStore.insertRow(parseInt(rowIdxs[0]) + 1);
             break;
         }
         case rowActions.insertAbove: {
             dataStore.addNewRow(rowIdxs[0], false);
+            chartStore.insertRow(parseInt(rowIdxs[0]));
             break;
         }
     }
@@ -271,14 +307,17 @@ const handleColAction = (): void => {
     switch (colAction.value) {
         case colActions.delete: {
             dataStore.deleteCols(colIdxs);
+            chartStore.deleteColumn(colIdxs.map(colIdx => parseInt(colIdx)));
             break;
         }
         case colActions.insertRight: {
             dataStore.addNewCol(colIdxs[0], true);
+            chartStore.insertColumn(parseInt(colIdxs[0]) + 1);
             break;
         }
         case colActions.insertLeft: {
             dataStore.addNewCol(colIdxs[0], false);
+            chartStore.insertColumn(parseInt(colIdxs[0]));
             break;
         }
     }

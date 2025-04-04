@@ -69,7 +69,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
+                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
                     :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
@@ -115,7 +115,7 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && !chartStore.chartConfig }"
+                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
                     :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',
@@ -252,7 +252,6 @@ const handleConfigFileUpload = (event: Event) => {
     const reader = new FileReader();
     reader.onload = (e) => {
         const res = JSON.parse(e.target?.result as string);
-        console.log('RESULT: ', res);
         chartStore.setChartConfig(res);
         // extract data from the config file
         extractGridData(res);
@@ -304,6 +303,7 @@ const exportHighchartsConfig = () => {
     padding: 8px;
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
     overflow-y: auto;
+    top: 0;
 }
 
 .side-nav-content {
