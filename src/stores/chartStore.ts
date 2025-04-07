@@ -148,7 +148,7 @@ export const useChartStore = defineStore('chartProperties', {
         deleteColumn(colIdxs: number[]): void {
             const sortedColIdxs = [...colIdxs].sort((a, b) => b - a);
             sortedColIdxs.forEach((colIdx: number) => {
-                this.chartConfig.series.splice(colIdx, 1);
+                this.chartConfig.series.splice(colIdx - 1, 1);
             });
         },
 
@@ -168,7 +168,7 @@ export const useChartStore = defineStore('chartProperties', {
                 type: this.chartType,
                 data: defaultData
             };
-            this.chartConfig.series.splice(colIdx, 0, newSeries);
+            this.chartConfig.series.splice(colIdx - 1, 0, newSeries);
         },
 
         /* Update header (series names) value **/
