@@ -82,6 +82,7 @@
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="(activeSeries as SeriesData).dashStyle"
+                    @change="() => console.log(activeSeries)"
                 >
                     <option v-for="dashStyle in Object.keys(dashOptions)" :key="dashStyle" :value="dashStyle">
                         {{ $t(`editor.customization.data.${dashStyle}`) }}
@@ -146,16 +147,18 @@ const showColourPicker = ref<boolean>(false);
 const chartType = ref<string>('');
 
 const seriesOptions: Record<string, string> = {
+    area: 'area',
     bar: 'bar',
     column: 'column',
     line: 'line',
+    pie: 'pie',
     scatter: 'scatter',
-    pie: 'pie'
+    spline: 'spline'
 };
 
 const dashOptions: Record<string, string> = {
-    dotted: 'dotted',
-    dashed: 'dashed',
+    dot: 'dot',
+    dash: 'dash',
     solid: 'solid'
 };
 

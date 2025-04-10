@@ -140,17 +140,21 @@ const hybridChartType = ref<string>('');
 const openMultiSelect = ref<boolean>(false);
 
 const chartTemplates: Record<string, string> = {
+    area: 'area',
     bar: 'bar',
     column: 'column',
     line: 'line',
+    pie: 'pie',
     scatter: 'scatter',
-    pie: 'pie'
+    spline: 'spline'
 };
 const hybridChartTemplates: Record<string, string> = {
     none: 'none',
+    area: 'area',
     column: 'column',
     line: 'line',
-    scatter: 'scatter'
+    scatter: 'scatter',
+    spline: 'spline'
 };
 
 let selectedHybridSeries = ref<string[]>([]);

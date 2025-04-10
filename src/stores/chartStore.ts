@@ -2,11 +2,13 @@ import { defineStore } from 'pinia';
 import { HighchartsConfig, SeriesData } from '../definitions';
 
 const chartTemplates: Record<string, string> = {
+    area: 'area',
     bar: 'bar',
     column: 'column',
     line: 'line',
+    pie: 'pie',
     scatter: 'scatter',
-    pie: 'pie'
+    spline: 'spline'
 };
 
 export const useChartStore = defineStore('chartProperties', {
@@ -71,6 +73,15 @@ export const useChartStore = defineStore('chartProperties', {
         /* Update highcharts configuration for chart type **/
         updateConfig(type: string, series: string[], headers: string[], gridData: string[][]): void {
             switch (type) {
+                case chartTemplates.area: {
+                    this.setChartType('area');
+                    const seriesData = headers
+                        .slice(1)
+                        .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
+
+                    this.updateAreaChart(series, seriesData);
+                    break;
+                }
                 case chartTemplates.bar: {
                     this.setChartType('bar');
                     const seriesData = headers
@@ -116,6 +127,15 @@ export const useChartStore = defineStore('chartProperties', {
                         this.updateScatterPlot(series, seriesData);
                     }
 
+                    break;
+                }
+                case chartTemplates.spline: {
+                    this.setChartType('spline');
+                    const seriesData = headers
+                        .slice(1)
+                        .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
+
+                    this.updateSplineChart(series, seriesData);
                     break;
                 }
                 case chartTemplates.pie: {
@@ -284,6 +304,38 @@ export const useChartStore = defineStore('chartProperties', {
                           marker: {
                               symbol: 'circle'
                           },
+                          data: seriesData[index]
+                      }
+                    : series
+            );
+        },
+
+        /* Update highcharts configuration for area chart **/
+        updateAreaChart(seriesNames: string[], seriesData: number[][]): void {
+            this.chartConfig.series = this.chartConfig.series.map((series, index) =>
+                seriesNames.includes(series.name)
+                    ? {
+                          name: series.name,
+                          type: 'area',
+                          color: this.defaultColours[index],
+                          dashstyle: 'solid',
+                          marker: { symbol: 'circle' },
+                          data: seriesData[index]
+                      }
+                    : series
+            );
+        },
+
+        /* Update highcharts configuration for spline chart **/
+        updateSplineChart(seriesNames: string[], seriesData: number[][]): void {
+            this.chartConfig.series = this.chartConfig.series.map((series, index) =>
+                seriesNames.includes(series.name)
+                    ? {
+                          name: series.name,
+                          type: 'spline',
+                          color: this.defaultColours[index],
+                          dashstyle: 'solid',
+                          marker: { symbol: 'circle' },
                           data: seriesData[index]
                       }
                     : series

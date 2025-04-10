@@ -44,10 +44,12 @@ editor.selection.template,Select chart template,1,Sélectionner un modèle de gr
 editor.selection.template1,Select template for graph 1,1,Sélectionner un modèle pour le graphique 1,0
 editor.selection.template2,Select template for graph 2,1,Sélectionner un modèle pour le graphique 2,0
 editor.selection.multiseries,Select data series for graph 2,1,Sélectionner la série de données pour le graphique 2,0
+editor.selection.area,Area chart,1,Graphique en aires,0
 editor.selection.bar,Bar chart,1,Graphique à barres,0
 editor.selection.column,Column chart,1,Diagramme à colonnes,0
 editor.selection.line,Line chart,1,Graphique linéaire,0
 editor.selection.scatter,Scatter plot,1,Nuage de points,0
+editor.selection.spline,Spline chart,1,Graphique spline,0
 editor.selection.pie,Pie chart,1,Diagramme circulaire,0
 editor.selection.none,None,1,Aucun,0
 editor.customization.title,Customize Chart,1,Personnaliser le Graphique,0
@@ -63,15 +65,17 @@ editor.customization.titles.placeholder,Untitled chart,1,Graphique sans titre,0
 editor.customization.advanced,Advanced,1,Avancé,0
 editor.customization.data.format,Format data,1,Formater les données,0
 editor.customization.data.seriesType,Series type,1,Type de série,0
+editor.customization.data.series.area,Area,1,Aires,0
 editor.customization.data.series.bar,Bar,1,Barres,0
 editor.customization.data.series.column,Column,1,Colonnes,0
 editor.customization.data.series.line,Line,1,Linéaire,0
 editor.customization.data.series.scatter,Scatter,1,Dispersion,0
+editor.customization.data.series.spline,Spline,1,Spline,0
 editor.customization.data.series.pie,Pie,1,Circulaire,0
 editor.customization.data.colour,Data colour,1,Couleur des données,0
 editor.customization.data.dashStyle,Dash style,1,Style de tiret,0
-editor.customization.data.dotted,Dotted,1,Pointé,0
-editor.customization.data.dashed,Dashed,1,Pointillé,0
+editor.customization.data.dot,Dotted,1,Pointé,0
+editor.customization.data.dash,Dashed,1,Pointillé,0
 editor.customization.data.solid,Solid,1,Solide,0
 editor.customization.data.pointMarker,Point marker symbol,1,Symbole de marqueur de point,0
 editor.customization.data.square,Square,1,Carré,0
