@@ -55,7 +55,12 @@
                 </data-customization>
             </div>
 
-            <data-customization :dataSeries="mainDataSeries" :chartType="chartStore.chartType" @loading="(val) => loading = val" v-else />
+            <data-customization
+                :dataSeries="mainDataSeries"
+                :chartType="chartStore.chartType"
+                @loading="(val) => (loading = val)"
+                v-else
+            />
         </template>
 
         <!-- Configure chart axes -->
@@ -65,17 +70,28 @@
 
         <!-- Custom JSON editor -->
         <template v-else>
-            <!-- <json-editor
+            <vue3-json-editor
+                class="mt-4"
                 v-model="updatedConfig"
-                lang="en"
-                :mode="'text'"
+                :mode="'code'"
                 :show-btns="false"
                 :expandedOnStart="true"
-                @has-error="(err: string) => { jsonError = err; validate()}"
-                @json-change="
-                    (json: any) => onJsonChange(json)
+                @has-error="
+                    (err: string) => {
+                        validatorErrors.push(err);
+                    }
                 "
-            ></json-editor> -->
+                @json-change="(newJson: any) => {
+                    validatorErrors = [];
+                    updatedConfig = newJson;
+                    validateConfig();
+                }"
+            </vue3-json-editor>
+            <div v-if="validatorErrors.length">
+                <ul class="list-disc ml-8">
+                    <li v-for="(error, idx) in validatorErrors" :key="idx">{{ error }}</li>
+                </ul>
+            </div>
         </template>
 
         <div v-if="!loading">
@@ -90,10 +106,12 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, onBeforeMount } from 'vue';
+import { computed, ref, onBeforeMount, onMounted } from 'vue';
 import { useRouter } from 'vue-router';
 import { useChartStore } from '../stores/chartStore';
 import { SeriesData } from '../definitions';
+import { Vue3JsonEditor } from 'vue3-json-editor';
+import { Validator } from 'jsonschema';
 
 import TitlesCustomization from './helpers/titles-customization.vue';
 import DataCustomization from './helpers/data-customization.vue';
@@ -106,20 +124,42 @@ dataModule(Highcharts);
 
 const chartStore = useChartStore();
 const chartConfig = computed(() => chartStore.chartConfig);
+let updatedConfig = ref<any>({});
 
 const router = useRouter();
 
 // add back 'advanced' after json editor implemented
-const sections = ['chartTitles', 'dataSeries', 'axes'];
+const sections = ['chartTitles', 'dataSeries', 'axes', 'advanced'];
 // default to chart titles
 const activeSection = ref<string>('chartTitles');
 const loading = ref<boolean>(false);
+
+let highchartsSchema = ref<string>('');
+const validator: Validator = new Validator();
+const validatorErrors = ref<any>([]);
 
 onBeforeMount(() => {
     // case of directly accessing page with no data
     if (Object.keys(chartConfig.value).length === 0) {
         router.push({ name: 'Data' });
     }
+});
+
+onMounted(() => {
+    // import highcharts schema for validation
+    const schemaUrl = '../../HighchartsSchema.json';
+    fetch(schemaUrl).then((schema) => {
+        // parse JSON schema
+        schema.json().then(
+            (res: any) => {
+                highchartsSchema.value = res;
+            },
+            (err) => {
+                console.error(err);
+            }
+        );
+    });
+    updatedConfig.value = chartConfig.value; 
 });
 
 const mainDataSeries = computed(() => {
@@ -141,10 +181,35 @@ const hybridDataSeries = computed(() => {
         return [];
     }
 });
+
+// validate updated highcharts config edited in JSON editor
+const validateConfig = () => {
+    const checkValidation = validator.validate(updatedConfig.value, highchartsSchema.value as any);
+    // console.log('validating: ', updatedConfig.value, highchartsSchema.value);
+    if (checkValidation.errors.length) {
+        validatorErrors.value = checkValidation.errors;
+        console.error('Validation errors:', checkValidation.errors);
+    } else {
+        // valid JSOn to update chart config
+        chartStore.setChartConfig(updatedConfig.value);
+    }
+};
 </script>
 
-<style lang="scss">
+<style lang="scss" scoped>
 .dv-chart-container {
     width: 98%;
+}
+
+:deep(.jsoneditor-vue) {
+    height: 100vh;
+}
+
+:deep(.jsoneditor-modes) {
+    display: none;
+}
+
+:deep(.jsoneditor-poweredBy) {
+    display: none;
 }
 </style>
