@@ -146,16 +146,18 @@ const showColourPicker = ref<boolean>(false);
 const chartType = ref<string>('');
 
 const seriesOptions: Record<string, string> = {
+    area: 'area',
     bar: 'bar',
     column: 'column',
     line: 'line',
+    pie: 'pie',
     scatter: 'scatter',
-    pie: 'pie'
+    spline: 'spline'
 };
 
 const dashOptions: Record<string, string> = {
-    dotted: 'dotted',
-    dashed: 'dashed',
+    dot: 'dot',
+    dash: 'dash',
     solid: 'solid'
 };
 

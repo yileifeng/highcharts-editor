@@ -2,11 +2,13 @@ import { defineStore } from 'pinia';
 import { HighchartsConfig, SeriesData } from '../definitions';
 
 const chartTemplates: Record<string, string> = {
+    area: 'area',
     bar: 'bar',
     column: 'column',
     line: 'line',
+    pie: 'pie',
     scatter: 'scatter',
-    pie: 'pie'
+    spline: 'spline'
 };
 
 export const useChartStore = defineStore('chartProperties', {
@@ -38,7 +40,7 @@ export const useChartStore = defineStore('chartProperties', {
         setupConfig(seriesNames: string[], cats: string[], seriesData: number[][]): void {
             this.chartConfig = {
                 title: {
-                    text: 'Base Chart'
+                    text: 'Basic Chart'
                 },
                 subtitle: {
                     text: ''
@@ -71,6 +73,15 @@ export const useChartStore = defineStore('chartProperties', {
         /* Update highcharts configuration for chart type **/
         updateConfig(type: string, series: string[], headers: string[], gridData: string[][]): void {
             switch (type) {
+                case chartTemplates.area: {
+                    this.setChartType('area');
+                    const seriesData = headers
+                        .slice(1)
+                        .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
+
+                    this.updateAreaChart(series, seriesData);
+                    break;
+                }
                 case chartTemplates.bar: {
                     this.setChartType('bar');
                     const seriesData = headers
@@ -118,6 +129,15 @@ export const useChartStore = defineStore('chartProperties', {
 
                     break;
                 }
+                case chartTemplates.spline: {
+                    this.setChartType('spline');
+                    const seriesData = headers
+                        .slice(1)
+                        .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
+
+                    this.updateSplineChart(series, seriesData);
+                    break;
+                }
                 case chartTemplates.pie: {
                     this.setChartType('pie');
                     const data = gridData.map((row) => ({
@@ -148,7 +168,7 @@ export const useChartStore = defineStore('chartProperties', {
         deleteColumn(colIdxs: number[]): void {
             const sortedColIdxs = [...colIdxs].sort((a, b) => b - a);
             sortedColIdxs.forEach((colIdx: number) => {
-                this.chartConfig.series.splice(colIdx, 1);
+                this.chartConfig.series.splice(colIdx - 1, 1);
             });
         },
 
@@ -168,7 +188,7 @@ export const useChartStore = defineStore('chartProperties', {
                 type: this.chartType,
                 data: defaultData
             };
-            this.chartConfig.series.splice(colIdx, 0, newSeries);
+            this.chartConfig.series.splice(colIdx - 1, 0, newSeries);
         },
 
         /* Update header (series names) value **/
@@ -193,7 +213,7 @@ export const useChartStore = defineStore('chartProperties', {
                           name: series.name,
                           type: 'line',
                           color: this.defaultColours[index],
-                          dashstyle: 'solid',
+                          dashStyle: 'solid',
                           marker: { symbol: 'circle' },
                           data: seriesData[index]
                       }
@@ -209,7 +229,7 @@ export const useChartStore = defineStore('chartProperties', {
                           name: series.name,
                           type: 'bar',
                           color: this.defaultColours[index],
-                          dashstyle: 'solid',
+                          dashStyle: 'solid',
                           marker: {
                               symbol: 'circle'
                           },
@@ -229,7 +249,7 @@ export const useChartStore = defineStore('chartProperties', {
             if (typeof seriesData === 'object') {
                 this.chartConfig = {
                     title: {
-                        text: 'Scatter Plot'
+                        text: 'Basic Chart'
                     },
                     subtitle: {
                         text: ''
@@ -263,7 +283,7 @@ export const useChartStore = defineStore('chartProperties', {
                               name: series.name,
                               type: 'scatter',
                               color: this.defaultColours[index],
-                              dashstyle: 'solid',
+                              dashStyle: 'solid',
                               marker: { symbol: 'circle' },
                               data: seriesData[index]
                           }
@@ -280,10 +300,42 @@ export const useChartStore = defineStore('chartProperties', {
                           name: series.name,
                           type: 'column',
                           color: this.defaultColours[index],
-                          dashstyle: 'solid',
+                          dashStyle: 'solid',
                           marker: {
                               symbol: 'circle'
                           },
+                          data: seriesData[index]
+                      }
+                    : series
+            );
+        },
+
+        /* Update highcharts configuration for area chart **/
+        updateAreaChart(seriesNames: string[], seriesData: number[][]): void {
+            this.chartConfig.series = this.chartConfig.series.map((series, index) =>
+                seriesNames.includes(series.name)
+                    ? {
+                          name: series.name,
+                          type: 'area',
+                          color: this.defaultColours[index],
+                          dashStyle: 'solid',
+                          marker: { symbol: 'circle' },
+                          data: seriesData[index]
+                      }
+                    : series
+            );
+        },
+
+        /* Update highcharts configuration for spline chart **/
+        updateSplineChart(seriesNames: string[], seriesData: number[][]): void {
+            this.chartConfig.series = this.chartConfig.series.map((series, index) =>
+                seriesNames.includes(series.name)
+                    ? {
+                          name: series.name,
+                          type: 'spline',
+                          color: this.defaultColours[index],
+                          dashStyle: 'solid',
+                          marker: { symbol: 'circle' },
                           data: seriesData[index]
                       }
                     : series
@@ -297,7 +349,7 @@ export const useChartStore = defineStore('chartProperties', {
             //     seriesNames.includes(series.name) ? { name: seriesNames[0], type: 'pie', data: seriesData[index] } : series
             // );
             this.chartConfig = {
-                title: { text: 'Pie Chart' },
+                title: { text: 'Basic Chart' },
                 subtitle: {
                     text: ''
                 },
