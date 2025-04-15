@@ -17,10 +17,12 @@
             <button
                 @click="saveChanges"
                 class="bg-black border border-black text-white hover:bg-gray-900 font-bold p-2"
+                :class="{ 'disabled hover:bg-gray-400': Object.keys(chartStore.chartConfig).length === 0 }"
+                :disabled="Object.keys(chartStore.chartConfig).length === 0"
             >
                 {{ $t('editor.saveChanges') }}
                 <span v-if="saving" class="align-middle inline-block px-1">
-                    <VueSpinnerOval size="16px" color="#009cd1" class="ml-1 mb-1"></VueSpinnerOval>
+                    <Spinner size="16px" color="#009cd1" class="ml-1 mb-1"></Spinner>
                 </span>
             </button>
         </header>
@@ -36,11 +38,11 @@
 
 <script setup lang="ts">
 import { onMounted, ref } from 'vue';
-import { VueSpinnerOval } from 'vue3-spinners';
 import { useChartStore } from './stores/chartStore';
 import { useI18n } from 'vue-i18n';
 
 import SideMenu from './components/side-menu.vue';
+import Spinner from './components/helpers/spinner.vue';
 
 const props = defineProps({
     lang: {
@@ -66,13 +68,11 @@ const changeLang = (): void => {
 };
 
 const saveChanges = (): void => {
-    if (Object.keys(chartStore.chartConfig).length) {
-        saving.value = true;
-        emit('saved', chartStore.chartConfig);
-        setTimeout(() => {
-            saving.value = false;
-        }, 1000);
-    }
+    saving.value = true;
+    emit('saved', chartStore.chartConfig);
+    setTimeout(() => {
+        saving.value = false;
+    }, 1000);
 };
 </script>
 
