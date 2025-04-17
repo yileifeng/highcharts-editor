@@ -33,7 +33,39 @@ export const useChartStore = defineStore('chartProperties', {
 
         /* Set highcharts config (from imported json file) **/
         setChartConfig(chartConfig: HighchartsConfig): void {
-            this.chartConfig = chartConfig;
+            // add mandatory fields blank (for customization section)
+            // TODO: tons of edge cases here depending on the complexity of a chart configuration
+            this.chartConfig = {
+                ...chartConfig,
+                title: {
+                    text: chartConfig.title?.text || ''
+                },
+                subtitle: {
+                    text: chartConfig.subtitle?.text || ''
+                },
+                xAxis: {
+                    ...chartConfig.xAxis,
+                    title: {
+                        text: chartConfig.xAxis?.title?.text || ''
+                    }
+                },
+                yAxis: Array.isArray(chartConfig.yAxis) ? chartConfig.yAxis : { 
+                    ...chartConfig.yAxis,
+                    title: {
+                        text: chartConfig.yAxis?.title?.text || ''
+                    }
+                },
+                series: (chartConfig.series as SeriesData[] || []).map((series) => ({
+                    ...series,
+                    type: series.type || '',
+                    color: series.color || '',
+                    dashStyle: series.dashStyle || '',
+                    marker: {
+                        ...series.marker,
+                        symbol: series.marker?.symbol || ''
+                    }
+                }))
+            };
         },
 
         /* Set default highcharts config **/
