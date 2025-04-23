@@ -99,7 +99,7 @@
 
         <!-- Navigate to customization page -->
         <div class="flex items-center mt-4">
-            <router-link class="p-4 ml-auto" :to="{ name: 'Customization' }">
+            <router-link class="ml-auto" :to="{ name: 'Customization' }">
                 <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
                     {{ $t('editor.customization.title') }}
                 </button>

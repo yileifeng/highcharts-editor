@@ -60,7 +60,6 @@
             <table class="table-auto border-collapse border border-black w-full mt-8">
                 <thead>
                     <tr class="bg-gray-200">
-                        <th class="border border-gray-400 w-16 p-2 text-left align-middle"></th>
                         <th
                             class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(header, colIdx) in headers"
@@ -70,7 +69,9 @@
                                 <span
                                     class="col-header flex-grow truncate"
                                     v-if="editingHeader !== colIdx"
+                                    tabindex="0"
                                     @click="editColHeader(colIdx)"
+                                    @focus="editColHeader(colIdx)"
                                 >
                                     {{ header || $t('editor.untitled') }}
                                 </span>
@@ -104,7 +105,9 @@
                                 <span
                                     class="grid-cell flex-grow truncate"
                                     v-if="editingCell.rowIdx !== rowIdx || editingCell.colIdx !== colIdx"
+                                    tabindex="0"
                                     @click="editCell(rowIdx, colIdx, value)"
+                                    @focus="editCell(rowIdx, colIdx, value)"
                                 >
                                     {{ value }}
                                 </span>
@@ -119,6 +122,7 @@
                                     class="grid-cell flex-grow w-0 max-w-[80%] box-border border border-black p-1"
                                     type="text"
                                     v-model="editingVal"
+                                    tabindex="0"
                                     @input="updateCell(rowIdx, colIdx, ($event.target as HTMLInputElement).value)"
                                     @blur="escEditCell"
                                     @keyup.enter="escEditCell"
@@ -137,7 +141,7 @@
         </div>
 
         <div class="flex items-center mt-4">
-            <router-link class="p-4 ml-auto" :to="{ name: 'ChartType' }">
+            <router-link class="ml-auto" :to="{ name: 'ChartType' }">
                 <button class="bg-black text-white border border-black hover:bg-gray-800 font-bold p-4 ml-auto">
                     {{ $t('editor.datatable.templates') }}
                 </button>
@@ -269,7 +273,7 @@ const escEditCell = () => {
 
 const updateHeader = (headerIdx: number, val: string) => {
     chartStore.updateHeader(headerIdx, val);
-}
+};
 
 const updateCell = (rowIdx: number, colIdx: number, val: string) => {
     dataStore.updateCell(rowIdx, colIdx, val);
@@ -282,7 +286,7 @@ const handleRowAction = (): void => {
     switch (rowAction.value) {
         case rowActions.delete: {
             dataStore.deleteRows(rowIdxs);
-            chartStore.deleteRow(rowIdxs.map(rowIdx => parseInt(rowIdx)));
+            chartStore.deleteRow(rowIdxs.map((rowIdx) => parseInt(rowIdx)));
             break;
         }
         case rowActions.insertBelow: {
@@ -307,7 +311,7 @@ const handleColAction = (): void => {
     switch (colAction.value) {
         case colActions.delete: {
             dataStore.deleteCols(colIdxs);
-            chartStore.deleteColumn(colIdxs.map(colIdx => parseInt(colIdx)));
+            chartStore.deleteColumn(colIdxs.map((colIdx) => parseInt(colIdx)));
             break;
         }
         case colActions.insertRight: {

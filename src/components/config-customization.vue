@@ -8,8 +8,10 @@
                     v-for="(section, idx) in sections"
                     :key="idx"
                     class="cursor-pointer py-2 px-4 flex-1 text-center"
+                    tabindex="0"
                     :class="{ 'font-semibold': activeSection === section }"
                     @click="() => (activeSection = section)"
+                    @keydown.enter="() => (activeSection = section)"
                 >
                     {{ $t(`editor.customization.${section}`) }}
                 </div>

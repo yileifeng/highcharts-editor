@@ -6,12 +6,12 @@
         <div class="flex items-center mt-4 mb-12">
             <button
                 class="flex items-center flex-shrink-0 px-2 py-1 mx-1 overflow-hidden"
-                :aria-label="expanded ? $t('chapters.collapse') : $t('editor.expand')"
+                :aria-label="expanded ? $t('editor.collapse') : $t('editor.expand')"
                 @click="expanded = !expanded"
                 v-tippy="{
                     delay: '200',
                     placement: 'right',
-                    content: expanded ? $t('chapters.collapse') : $t('editor.expand'),
+                    content: expanded ? $t('editor.collapse') : $t('editor.expand'),
                     onShow: () => !expanded,
                     animateFill: true
                 }"
@@ -41,8 +41,7 @@
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.data.title'),
-                        animateFill: true,
-                        animation: 'chapter-menu'
+                        animateFill: true
                     }"
                 >
                     <svg
@@ -69,14 +68,14 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
+                    :class="{ disabled: btnDisabled }"
+                    :tabIndex="btnDisabled ? -1 : 0"
                     :to="{ name: 'ChartType' }"
                     v-tippy="{
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.toc.chartType'),
-                        animateFill: true,
-                        animation: 'chapter-menu'
+                        animateFill: true
                     }"
                 >
                     <svg
@@ -115,14 +114,14 @@
             <li>
                 <router-link
                     class="flex items-center px-2 my-6 mx-1"
-                    :class="{ disabled: !uploaded && Object.keys(chartStore.chartConfig).length === 0 }"
+                    :class="{ disabled: btnDisabled }"
+                    :tabIndex="btnDisabled ? -1 : 0"
                     :to="{ name: 'Customization' }"
                     v-tippy="{
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.toc.chartCustomize'),
-                        animateFill: true,
-                        animation: 'chapter-menu'
+                        animateFill: true
                     }"
                 >
                     <svg
@@ -144,9 +143,11 @@
             </li>
         </ul>
 
-        <div v-if="expanded">
+        <div v-show="expanded">
             <button
                 class="flex bg-black text-white justify-center border border-black w-full hover:bg-gray-400 font-bold px-4 py-2 my-2"
+                tabindex="0"
+                :aria-label="$t('editor.toc.importChart')"
                 @click="uploadHighchartsConfig"
             >
                 <svg
@@ -166,11 +167,21 @@
                 </svg>
                 {{ $t('editor.toc.importChart') }}
             </button>
-            <input ref="highchartsInput" type="file" accept=".json" class="hidden" @change="handleConfigFileUpload" />
+            <input
+                ref="highchartsInput"
+                type="file"
+                accept=".json"
+                class="hidden"
+                tabindex="-1"
+                :aria-label="$t('editor.toc.importChart')"
+                @change="handleConfigFileUpload"
+            />
             <button
                 class="flex bg-white justify-center border border-black w-full hover:bg-gray-100 font-bold px-4 py-2 my-2"
-                :class="{ 'disabled hover:bg-gray-400': Object.keys(chartStore.chartConfig).length === 0 }"
-                :disabled="Object.keys(chartStore.chartConfig).length === 0"
+                :aria-label="$t('editor.toc.exportConfig')"
+                :class="{ 'disabled hover:bg-gray-400': btnDisabled }"
+                :disabled="btnDisabled"
+                :tabIndex="btnDisabled ? -1 : 0"
                 @click="exportHighchartsConfig"
             >
                 <svg
@@ -232,6 +243,7 @@ defineProps({
 
 const dataStore = useDataStore();
 const uploaded = computed(() => dataStore.uploaded);
+const btnDisabled = computed(() => !uploaded.value && Object.keys(chartStore.chartConfig).length === 0);
 
 const highchartsInput = ref<HTMLInputElement | null>(null);
 const expanded = ref(false);
@@ -255,9 +267,9 @@ const handleConfigFileUpload = (event: Event) => {
         chartStore.setChartConfig(res);
         // extract data from the config file
         extractGridData(res);
-    }
+    };
     reader.readAsText(configFile);
-    
+
     // clear input
     (event.target as HTMLInputElement).value = '';
     dataStore.setDatatableView(true);

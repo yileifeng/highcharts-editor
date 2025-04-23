@@ -40,6 +40,8 @@
                         class="cursor-pointer"
                         @change="onFileUpload($event)"
                         accept=".csv,.xlsx,.xls"
+                        tabindex="-1"
+                        :aria-label="$t('editor.data.upload')"
                         :disabled="fileName !== ''"
                     />
                 </div>
