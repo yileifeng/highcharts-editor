@@ -15,6 +15,7 @@
                     class="border border-black mr-4 p-2 rounded bg-gray-300 focus:bg-white"
                     v-model="rowAction"
                     @change="handleRowAction()"
+                    :aria-label="$t('editor.datatable.rowActions')"
                 >
                     <option value="" hidden>{{ $t('editor.datatable.rowActions') }}</option>
                     <!-- Enable insert when exactly one row is selected, enable delete when any number of rows are selected -->
@@ -36,6 +37,7 @@
                     class="border border-black p-2 rounded bg-gray-300 focus:bg-white"
                     v-model="colAction"
                     @change="handleColAction()"
+                    :aria-label="$t('editor.datatable.colActions')"
                 >
                     <option value="" hidden>{{ $t('editor.datatable.colActions') }}</option>
                     <!-- Enable insert when exactly one col is selected, enable delete when any number of cols are selected -->
@@ -60,6 +62,9 @@
             <table class="table-auto border-collapse border border-black w-full mt-8">
                 <thead>
                     <tr class="bg-gray-200">
+                        <th class="border border-gray-400 w-16 p-2 text-left align-middle">
+                            <span class="sr-only">{{ $t('editor.datatable.selectRow') }}</span>
+                        </th>
                         <th
                             class="border border-gray-400 p-2 text-left align-middle"
                             v-for="(header, colIdx) in headers"
@@ -85,7 +90,12 @@
                                     @blur="escEditCell"
                                     @keyup.enter="escEditCell"
                                 />
-                                <input class="ml-2" type="checkbox" v-model="selectedCols[colIdx]" />
+                                <input
+                                    class="ml-2"
+                                    type="checkbox"
+                                    v-model="selectedCols[colIdx]"
+                                    :aria-label="$t('editor.datatable.selectCol')"
+                                />
                             </div>
                         </th>
                     </tr>
@@ -93,7 +103,11 @@
                 <tbody>
                     <tr class="even:bg-gray-50" v-for="(row, rowIdx) in gridData" :key="rowIdx">
                         <td class="border border-gray-400 p-2 text-left">
-                            <input type="checkbox" v-model="selectedRows[rowIdx]" />
+                            <input
+                                type="checkbox"
+                                v-model="selectedRows[rowIdx]"
+                                :aria-label="$t('editor.datatable.selectRow')"
+                            />
                         </td>
                         <td
                             class="grid-cell border border-gray-400 p-2 text-left align-middle"
@@ -332,4 +346,16 @@ const handleColAction = (): void => {
 };
 </script>
 
-<style lang="scss"></style>
+<style lang="scss">
+.sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+}
+</style>

@@ -1,13 +1,14 @@
 <template>
     <div class="h-full">
-        <h3 class="font-bold text-lg">{{ $t('editor.data.paste.label') }}</h3>
+        <div class="font-bold text-lg">{{ $t('editor.data.paste.label') }}</div>
         <div class="mt-2">{{ $t('editor.data.paste.description') }}</div>
 
         <textarea
             class="paste-box border border-black h-2/3 w-full mt-4 p-2"
-            :placeholder="$t('editor.data.paste.placeholder')"
             @keydown="handleKeyDown"
             v-model="pastedData"
+            :placeholder="$t('editor.data.paste.placeholder')"
+            :aria-label="$t('editor.data.paste.placeholder')"
         ></textarea>
 
         <div class="flex mt-4">

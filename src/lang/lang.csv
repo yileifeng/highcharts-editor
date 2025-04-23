@@ -20,6 +20,7 @@ editor.toc.exportConfig,Export configuration (.json),1,Exporter la configuration
 editor.data.title,Data,1,Données,1
 editor.data.description,"Upload your data to start creating a highchart. You may either import data by uploading a file or pasting your data directly.",1,"Téléchargez vos données pour commencer à créer un highchart. Vous pouvez soit importer des données en téléchargeant un fichier, soit en collant vos données directement.",0
 editor.data.drag,Drag and drop file here,1,Glissez et déposez le fichier ici,0
+editor.data.filename,File name,1,Nom de fichier,0
 editor.data.upload,Select file from device,1,Sélectionner un fichier sur l'appareil,0
 editor.data.supported,"Supported file types: csv, xls, xlsx",1,"Types de fichiers pris en charge : csv, xls, xlsx",0
 editor.data.import,Import data from file,1,Importer des données à partir d'un fichier,0
@@ -30,6 +31,8 @@ editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in
 editor.data.paste.placeholder,Paste data here,1,Collez les données ici,
 editor.data.modify,"Here, you can modify your dataset. The default standard is that the first column will be reserved for category labels.",1,"Ici, vous pouvez modifier votre ensemble de données. Par défaut, la première colonne est réservée aux libellés de catégories.",0
 editor.datatable.uploadNew,Upload new data,1,Télécharger de nouvelles données,0
+editor.datatable.selectRow,Select row,1,Sélectionner une ligne,0
+editor.datatable.selectCol,Select column,1,Sélectionner une colonne,0
 editor.datatable.rowActions,Row actions,1,Actions sur les lignes,0
 editor.datatable.rowActions.delete,Delete row(s),1,Supprimer des lignes,0
 editor.datatable.rowActions.insertBelow,Insert below,1,Insérer ci-dessous,0

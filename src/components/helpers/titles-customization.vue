@@ -2,12 +2,13 @@
     <div class="chart-customization-title">
         <div class="font-bold mt-6">
             {{ $t('editor.customization.titles.chart') }}
-            <span class="font-normal text-red-500">{{ $t('editor.customization.required') }}</span>
+            <span class="font-normal text-red-600">{{ $t('editor.customization.required') }}</span>
         </div>
         <input
             class="border border-black box-border w-full mt-2 p-2 pr-6"
             :class="{ 'border-red-500': !chartConfig.title.text }"
             :placeholder="$t('editor.customization.titles.placeholder')"
+            :aria-label="$t('editor.customization.titles.chart')"
             type="text"
             v-model="chartConfig.title.text"
         />
@@ -18,6 +19,7 @@
         <input
             class="border border-black box-border w-full mt-2 p-2 pr-6"
             :placeholder="$t('editor.customization.titles.placeholder')"
+            :aria-label="$t('editor.customization.titles.subtitle')"
             type="text"
             v-model="chartConfig.subtitle.text"
         />

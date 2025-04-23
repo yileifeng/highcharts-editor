@@ -5,12 +5,13 @@
         <!-- Main chart type selection (if only one chart type) -->
         <div class="font-bold mt-6">
             {{ enableHybrid ? $t('editor.selection.template1') : $t('editor.selection.template') }}
-            <span class="text-red-500" v-if="enableHybrid">{{ $t('editor.customization.required') }}</span>
+            <span class="text-red-600" v-if="enableHybrid">{{ $t('editor.customization.required') }}</span>
         </div>
         <div class="relative w-1/2 mt-2">
             <select
                 class="border border-black w-full mt-2 p-2 rounded"
                 v-model="chartType"
+                :aria-label="enableHybrid ? $t('editor.selection.template1') : $t('editor.selection.template')"
                 @change="handleChartSelection"
             >
                 <option v-for="template in Object.keys(chartTemplates)" :key="template" :value="template">
@@ -30,6 +31,7 @@
                 <select
                     class="border border-black w-full mt-2 p-2 rounded"
                     v-model="hybridChartType"
+                    :aria-label="$t('editor.selection.template2')"
                     @change="handleHybridSelection"
                 >
                     <option v-for="template in Object.keys(hybridChartTemplates)" :key="template" :value="template">

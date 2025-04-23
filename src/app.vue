@@ -3,15 +3,24 @@
         <header
             class="editor-header sticky top-0 flex border-b border-black bg-gray-200 py-2 px-2 justify-between z-40"
         >
-            <div class="w-mobile-full flex items-center truncate">
+            <h1 class="w-mobile-full flex items-center truncate">
                 <span class="font-semibold text-lg m-1">{{ $t('editor.title') }}</span>
-            </div>
+            </h1>
 
             <button
                 @click="changeLang"
                 class="bg-white border border-black hover:bg-gray-100 font-bold p-2 ml-auto mr-4"
+                v-if="!props.editor"
             >
                 {{ appLang === 'en' ? $t('editor.lang.fr') : $t('editor.lang.en') }}
+            </button>
+
+            <button
+                @click="emit('cancel')"
+                class="bg-white border border-black hover:bg-gray-100 font-bold p-2 ml-auto mr-4"
+                v-else
+            >
+                {{ $t('editor.label.cancel') }}
             </button>
 
             <button
@@ -45,12 +54,15 @@ import SideMenu from './components/side-menu.vue';
 import Spinner from './components/helpers/spinner.vue';
 
 const props = defineProps({
+    editor: {
+        type: Boolean
+    },
     lang: {
         type: String
     }
 });
 
-const emit = defineEmits(['saved']);
+const emit = defineEmits(['cancel', 'saved']);
 
 const i18n = useI18n();
 const chartStore = useChartStore();
