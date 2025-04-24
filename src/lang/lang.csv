@@ -27,7 +27,7 @@ editor.data.import,Import data from file,1,Importer des données à partir d'un 
 editor.data.import.instructions,You may only upload one file at a time. You may remove this file to select another.,1,Vous ne pouvez télécharger qu'un seul fichier à la fois. Vous pouvez supprimer ce fichier pour en sélectionner un autre.,0
 editor.data.paste,Paste your data,1,Collez vos données,0
 editor.data.paste.label,Use pasted data,1,Utiliser des données collées,0
-editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below. Please use comma separated values to best avoid errors.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans le champ ci-dessous. Veuillez utiliser des valeurs séparées par des virgules pour éviter les erreurs.",0
+editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below. Please use comma separated values to best avoid errors. Note that the first row should correspond to axis/category titles.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans le champ ci-dessous. Veuillez utiliser des valeurs séparées par des virgules pour éviter les erreurs. Notez que la première ligne doit correspondre aux titres des axes/catégories.",0
 editor.data.paste.placeholder,Paste data here,1,Collez les données ici,
 editor.data.modify,"Here, you can modify your dataset. The default standard is that the first column will be reserved for category labels.",1,"Ici, vous pouvez modifier votre ensemble de données. Par défaut, la première colonne est réservée aux libellés de catégories.",0
 editor.datatable.uploadNew,Upload new data,1,Télécharger de nouvelles données,0
@@ -66,6 +66,7 @@ editor.customization.titles.chart,Chart title,1,Titre du graphique,0
 editor.customization.titles.subtitle,Chart sub-title,1,Sous-titre du graphique,0
 editor.customization.titles.placeholder,Untitled chart,1,Graphique sans titre,0
 editor.customization.advanced,Advanced,1,Avancé,0
+editor.customization.advanced.editor,JSON editor,1,Éditeur JSON,0
 editor.customization.data.format,Format data,1,Formater les données,0
 editor.customization.data.seriesType,Series type,1,Type de série,0
 editor.customization.data.series.area,Area,1,Aires,0
