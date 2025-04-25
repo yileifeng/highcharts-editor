@@ -40,10 +40,12 @@
                         class="cursor-pointer"
                         @change="onFileUpload($event)"
                         accept=".csv,.xlsx,.xls"
+                        tabindex="-1"
+                        :aria-label="$t('editor.data.upload')"
                         :disabled="fileName !== ''"
                     />
                 </div>
-                <div class="mt-4 text-gray-400">{{ $t('editor.data.supported') }}</div>
+                <div class="mt-4 text-gray-600">{{ $t('editor.data.supported') }}</div>
                 <div v-if="fileName">
                     <div class="relative w-full">
                         <input
@@ -51,6 +53,7 @@
                             type="search"
                             readonly
                             v-model="fileName"
+                            :aria-label="$t('editor.data.filename')"
                         />
                         <span
                             class="clear-btn absolute cursor-pointer"
@@ -58,12 +61,14 @@
                                 () => {
                                     fileName = '';
                                     dataFile = undefined;
+                                    dataStore.toggleUploaded(false);
+                                    chartStore.clearChartConfig();
                                 }
                             "
                             >X</span
                         >
                     </div>
-                    <div class="mt-4 text-gray-500">{{ $t('editor.data.import.instructions') }}</div>
+                    <div class="mt-4 text-gray-600">{{ $t('editor.data.import.instructions') }}</div>
                 </div>
             </div>
 
@@ -117,10 +122,12 @@
 import { ref, onMounted } from 'vue';
 import { VueFinalModal } from 'vue-final-modal';
 import { useDataStore } from '../stores/dataStore';
+import { useChartStore } from '../stores/chartStore';
 
 import PasteData from './helpers/paste-data.vue';
 import DataTable from './data-table.vue';
 
+const chartStore = useChartStore();
 const dataStore = useDataStore();
 
 const dataFile = ref<File | undefined>(undefined);

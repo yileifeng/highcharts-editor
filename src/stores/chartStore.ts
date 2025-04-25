@@ -31,6 +31,11 @@ export const useChartStore = defineStore('chartProperties', {
             this.hybridChartType = chartType;
         },
 
+        /* Clear highcharts config **/
+        clearChartConfig(): void {
+            this.chartConfig = {};
+        },
+
         /* Set highcharts config (from imported json file) **/
         setChartConfig(chartConfig: HighchartsConfig): void {
             // add mandatory fields blank (for customization section)

@@ -8,8 +8,15 @@
                     v-for="(section, idx) in sections"
                     :key="idx"
                     class="cursor-pointer py-2 px-4 flex-1 text-center"
+                    tabindex="0"
                     :class="{ 'font-semibold': activeSection === section }"
-                    @click="() => (activeSection = section)"
+                    @click="() => {
+                        activeSection = section;
+                        if (section === 'advanced') {
+                            addAriaLabel();
+                        }
+                    }"
+                    @keydown.enter="() => (activeSection = section)"
                 >
                     {{ $t(`editor.customization.${section}`) }}
                 </div>
@@ -112,6 +119,7 @@ import { useChartStore } from '../stores/chartStore';
 import { SeriesData } from '../definitions';
 import { Vue3JsonEditor } from 'vue3-json-editor';
 import { Validator } from 'jsonschema';
+import { useI18n } from 'vue-i18n';
 
 import TitlesCustomization from './helpers/titles-customization.vue';
 import DataCustomization from './helpers/data-customization.vue';
@@ -126,6 +134,7 @@ const chartStore = useChartStore();
 const chartConfig = computed(() => chartStore.chartConfig);
 let updatedConfig = ref<any>({});
 
+const { t } = useI18n();
 const router = useRouter();
 
 // add back 'advanced' after json editor implemented
@@ -194,6 +203,15 @@ const validateConfig = () => {
         chartStore.setChartConfig(updatedConfig.value);
     }
 };
+
+const addAriaLabel = () => {
+    setTimeout(() => {
+        const textarea = document.querySelector('.ace_text-input');
+        if (textarea) {
+            textarea.setAttribute('aria-label', t('editor.customization.advanced.editor'));
+        }
+    }, 0);
+};
 </script>
 
 <style lang="scss" scoped>
@@ -211,5 +229,17 @@ const validateConfig = () => {
 
 :deep(.jsoneditor-poweredBy) {
     display: none;
+}
+
+:deep(.ace-jsoneditor .ace_text-layer) {
+    color: #000;
+}
+
+:deep(.ace-jsoneditor .ace_string) {
+    color: #006400;
+}
+
+:deep(.ace-jsoneditor .ace_constant.ace_numeric) {
+    color: #8B0000;
 }
 </style>

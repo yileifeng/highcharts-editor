@@ -6,6 +6,7 @@
             <select
                 class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                 v-model="activeDataSeries"
+                :aria-label="$t('editor.customization.dataSeries')"
             >
                 <!-- Enable insert when exactly one row is selected, enable delete when any number of rows are selected -->
                 <option v-for="series in dataSeries" :value="series">
@@ -23,6 +24,7 @@
                 type="text"
                 class="border border-black w-full p-2 rounded bg-white"
                 :value="chartType"
+                :aria-label="$t('editor.customization.data.seriesType')"
                 v-if="hybrid"
             />
             <!-- TODO: decide if should allow changing series type in hybrid customization - may lead to complications -->
@@ -30,6 +32,7 @@
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="chartType"
+                    :aria-label="$t('editor.customization.data.seriesType')"
                     @change="changeChartType"
                 >
                     <option v-for="series in Object.keys(seriesOptions)" :key="series" :value="series">
@@ -82,6 +85,7 @@
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="(activeSeries as SeriesData).dashStyle"
+                    :aria-label="$t('editor.customization.data.dashStyle')"
                 >
                     <option v-for="dashStyle in Object.keys(dashOptions)" :key="dashStyle" :value="dashStyle">
                         {{ $t(`editor.customization.data.${dashStyle}`) }}
@@ -95,6 +99,7 @@
                 <select
                     class="border border-black w-full p-2 rounded appearance-none cursor-pointer"
                     v-model="(activeSeries as SeriesData).marker!.symbol"
+                    :aria-label="$t('editor.customization.data.pointMarker')"
                 >
                     <option v-for="pointMarker in Object.keys(markerOptions)" :key="pointMarker" :value="pointMarker">
                         {{ $t(`editor.customization.data.${pointMarker}`) }}

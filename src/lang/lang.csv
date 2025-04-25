@@ -20,16 +20,19 @@ editor.toc.exportConfig,Export configuration (.json),1,Exporter la configuration
 editor.data.title,Data,1,Données,1
 editor.data.description,"Upload your data to start creating a highchart. You may either import data by uploading a file or pasting your data directly.",1,"Téléchargez vos données pour commencer à créer un highchart. Vous pouvez soit importer des données en téléchargeant un fichier, soit en collant vos données directement.",0
 editor.data.drag,Drag and drop file here,1,Glissez et déposez le fichier ici,0
+editor.data.filename,File name,1,Nom de fichier,0
 editor.data.upload,Select file from device,1,Sélectionner un fichier sur l'appareil,0
 editor.data.supported,"Supported file types: csv, xls, xlsx",1,"Types de fichiers pris en charge : csv, xls, xlsx",0
 editor.data.import,Import data from file,1,Importer des données à partir d'un fichier,0
 editor.data.import.instructions,You may only upload one file at a time. You may remove this file to select another.,1,Vous ne pouvez télécharger qu'un seul fichier à la fois. Vous pouvez supprimer ce fichier pour en sélectionner un autre.,0
 editor.data.paste,Paste your data,1,Collez vos données,0
 editor.data.paste.label,Use pasted data,1,Utiliser des données collées,0
-editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below. Please use comma separated values to best avoid errors.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans le champ ci-dessous. Veuillez utiliser des valeurs séparées par des virgules pour éviter les erreurs.",0
+editor.data.paste.description,"Copy data from a CSV or Excel file, then paste in the box below. Please use comma separated values to best avoid errors. Note that the first row should correspond to axis/category titles.",1,"Copiez les données d'un fichier CSV ou Excel, puis collez-les dans le champ ci-dessous. Veuillez utiliser des valeurs séparées par des virgules pour éviter les erreurs. Notez que la première ligne doit correspondre aux titres des axes/catégories.",0
 editor.data.paste.placeholder,Paste data here,1,Collez les données ici,
 editor.data.modify,"Here, you can modify your dataset. The default standard is that the first column will be reserved for category labels.",1,"Ici, vous pouvez modifier votre ensemble de données. Par défaut, la première colonne est réservée aux libellés de catégories.",0
 editor.datatable.uploadNew,Upload new data,1,Télécharger de nouvelles données,0
+editor.datatable.selectRow,Select row,1,Sélectionner une ligne,0
+editor.datatable.selectCol,Select column,1,Sélectionner une colonne,0
 editor.datatable.rowActions,Row actions,1,Actions sur les lignes,0
 editor.datatable.rowActions.delete,Delete row(s),1,Supprimer des lignes,0
 editor.datatable.rowActions.insertBelow,Insert below,1,Insérer ci-dessous,0
@@ -63,6 +66,7 @@ editor.customization.titles.chart,Chart title,1,Titre du graphique,0
 editor.customization.titles.subtitle,Chart sub-title,1,Sous-titre du graphique,0
 editor.customization.titles.placeholder,Untitled chart,1,Graphique sans titre,0
 editor.customization.advanced,Advanced,1,Avancé,0
+editor.customization.advanced.editor,JSON editor,1,Éditeur JSON,0
 editor.customization.data.format,Format data,1,Formater les données,0
 editor.customization.data.seriesType,Series type,1,Type de série,0
 editor.customization.data.series.area,Area,1,Aires,0

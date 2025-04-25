@@ -7,6 +7,7 @@
             <input
                 class="border border-black box-border w-full mt-2 p-2 pr-6"
                 :placeholder="$t('editor.customization.axes.placeholder')"
+                :aria-label="$t('editor.customization.axes.xaxis')"
                 type="text"
                 v-model="chartConfig.xAxis.title.text"
             />
@@ -17,6 +18,7 @@
             <input
                 class="border border-black box-border w-full mt-2 p-2 pr-6"
                 :placeholder="$t('editor.customization.axes.placeholder')"
+                :aria-label="$t('editor.customization.axes.yaxis')"
                 type="text"
                 v-model="chartConfig.yAxis.title.text"
             />
