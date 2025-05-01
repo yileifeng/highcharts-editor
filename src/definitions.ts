@@ -43,6 +43,7 @@ export interface SeriesData {
     name: string;
     type: string;
     color?: string;
+    colors?: string[];
     y?: number;
     marker?: {
         symbol: string;

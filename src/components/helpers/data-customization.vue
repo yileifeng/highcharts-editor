@@ -108,6 +108,46 @@
                 <div class="select-arrow absolute right-2 top-1/2"></div>
             </div>
         </div>
+
+        <div v-else>
+            <div class="font-bold mt-4">{{ $t('editor.customization.data.colours') }}</div>
+            <div class="flex flex-col mt-2 w-1/6">
+                <div class="flex flex-col" v-for="(color, index) in (activeSeries as SeriesData).colors" :key="index">
+                    <div
+                        class="colour-dropdown w-full rounded border border-gray-500 flex items-center justify-between cursor-pointer mb-2"
+                        @click="() => (showPieColourPicker[index] = !showPieColourPicker[index])"
+                        @keypress.enter="() => (showPieColourPicker[index] = !showPieColourPicker[index])"
+                        tabindex="0"
+                    >
+                        <div class="flex w-full h-full bg-white rounded">
+                            <div
+                                class="rounded border-r border-gray-400 w-10"
+                                tabindex="0"
+                                :style="{ 'background-color': color }"
+                            ></div>
+                            <div class="flex items-center px-3">{{ color }}</div>
+                            <div class="flex items-center justify-center pr-2 ml-auto">
+                                <span class="select-arrow"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div
+                        v-if="showPieColourPicker[index]"
+                        class="w-full items-center justify-center border border-gray-300 rounded-md p-2 shadow-sm"
+                    >
+                        <ColorPicker
+                            :color="color"
+                            alpha-channel="hide"
+                            :visible-formats="['hex']"
+                            default-format="hex"
+                            @color-change="(eventData) => updatePieColour(index, eventData.cssColor)"
+                        >
+                            <template #copy-button></template>
+                        </ColorPicker>
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -147,6 +187,7 @@ const activeSeries = computed(() => {
     }
 });
 const showColourPicker = ref<boolean>(false);
+const showPieColourPicker = ref<boolean[]>([]);
 
 const chartType = ref<string>('');
 
@@ -175,10 +216,19 @@ const markerOptions: Record<string, string> = {
 onBeforeMount(() => {
     activeDataSeries.value = props.dataSeries[0];
     chartType.value = (activeSeries.value as SeriesData).type;
+    if (chartType.value === 'pie') {
+        for (let i = 0; i < (activeSeries.value as SeriesData).colors!.length; i++) {
+            showPieColourPicker[i] = false;
+        }
+    }
 });
 
 const updateColour = (eventData: any) => {
     (activeSeries.value as SeriesData).color = eventData.cssColor;
+};
+
+const updatePieColour = (index: number, color: string) => {
+    (activeSeries.value as SeriesData).colors![index] = color;
 };
 
 const changeChartType = () => {
@@ -189,6 +239,12 @@ const changeChartType = () => {
     setTimeout(() => {
         emit('loading', false);
     }, 100);
+
+    if (chartType.value === 'pie') {
+        for (let i = 0; i < (activeSeries.value as SeriesData).colors!.length; i++) {
+            showPieColourPicker[i] = false;
+        }
+    }
 };
 </script>
 

@@ -77,6 +77,7 @@ editor.customization.data.series.scatter,Scatter,1,Dispersion,1
 editor.customization.data.series.spline,Spline,1,Spline,1
 editor.customization.data.series.pie,Pie,1,Circulaire,1
 editor.customization.data.colour,Data colour,1,Couleur des données,1
+editor.customization.data.colours,Data colours,1,Couleurs des données,1
 editor.customization.data.dashStyle,Dash style,1,Style de tiret,1
 editor.customization.data.dot,Dotted,1,Pointé,1
 editor.customization.data.dash,Dashed,1,Pointillé,1

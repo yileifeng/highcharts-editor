@@ -17,7 +17,18 @@ export const useChartStore = defineStore('chartProperties', {
         hybridChartType: '' as string,
         chartSeries: [] as string[],
         chartConfig: {} as HighchartsConfig,
-        defaultColours: ['#2caffe', '#f45b5b', '#91e8e1', '#8d4654']
+        defaultColours: [
+            '#2caffe',
+            '#544fc5',
+            '#00e272',
+            '#fe6a35',
+            '#6b8abc',
+            '#d568fb',
+            '#2ee0ca',
+            '#fa4b42',
+            '#feb56a',
+            '#91e8e1'
+        ]
     }),
 
     actions: {
@@ -54,13 +65,15 @@ export const useChartStore = defineStore('chartProperties', {
                         text: chartConfig.xAxis?.title?.text || ''
                     }
                 },
-                yAxis: Array.isArray(chartConfig.yAxis) ? chartConfig.yAxis : { 
-                    ...chartConfig.yAxis,
-                    title: {
-                        text: chartConfig.yAxis?.title?.text || ''
-                    }
-                },
-                series: (chartConfig.series as SeriesData[] || []).map((series) => ({
+                yAxis: Array.isArray(chartConfig.yAxis)
+                    ? chartConfig.yAxis
+                    : {
+                          ...chartConfig.yAxis,
+                          title: {
+                              text: chartConfig.yAxis?.title?.text || ''
+                          }
+                      },
+                series: ((chartConfig.series as SeriesData[]) || []).map((series) => ({
                     ...series,
                     type: series.type || '',
                     color: series.color || '',
@@ -394,7 +407,8 @@ export const useChartStore = defineStore('chartProperties', {
                     {
                         name: seriesNames[0],
                         type: 'pie',
-                        data: seriesData
+                        data: seriesData,
+                        colors: this.defaultColours
                     }
                 ]
             };
