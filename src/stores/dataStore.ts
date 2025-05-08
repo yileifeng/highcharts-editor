@@ -72,9 +72,9 @@ export const useDataStore = defineStore('chartData', {
         addNewCol(selectedColIdx: string, right: boolean = true): void {
             const newCol = '';
             // determine new position based on insert right/left
-            const newIdx = right ? selectedColIdx + 1 : selectedColIdx;
+            const newIdx = right ? parseInt(selectedColIdx) + 1 : parseInt(selectedColIdx);
             // add new header and empty col of values
-            this.headers.splice(parseInt(newIdx), 0, newCol); 
+            this.headers.splice(newIdx, 0, newCol); 
             this.gridData.forEach((row) => {
                 row.splice(newIdx, 0, '');
             });
