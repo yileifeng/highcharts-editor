@@ -41,11 +41,13 @@
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.data.title'),
+                        onShow: () => !expanded,
                         animateFill: true
                     }"
                 >
                     <svg
                         class="flex-shrink-0"
+                        :class="{ 'bg-gray-200 rounded-md': $route.name  === 'Data' }"
                         width="24"
                         height="24"
                         viewBox="0 0 24 24"
@@ -75,11 +77,13 @@
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.toc.chartType'),
+                        onShow: () => !expanded,
                         animateFill: true
                     }"
                 >
                     <svg
                         class="flex-shrink-0"
+                        :class="{ 'bg-gray-200 rounded-md': $route.name  === 'ChartType'}"
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
                         height="24"
@@ -121,11 +125,13 @@
                         delay: '200',
                         placement: 'right',
                         content: $t('editor.toc.chartCustomize'),
+                        onShow: () => !expanded,
                         animateFill: true
                     }"
                 >
                     <svg
                         class="flex-shrink-0"
+                        :class="{ 'bg-gray-200 rounded-md': $route.name === 'Customization'}"
                         xmlns="http://www.w3.org/2000/svg"
                         width="24"
                         height="24"
