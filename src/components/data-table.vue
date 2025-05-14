@@ -16,6 +16,7 @@
                     v-model="rowAction"
                     @change="handleRowAction()"
                     :aria-label="$t('editor.datatable.rowActions')"
+                    :disabled="!Object.values(selectedRows).some((row) => row)"
                 >
                     <option value="" hidden>{{ $t('editor.datatable.rowActions') }}</option>
                     <!-- Enable insert when exactly one row is selected, enable delete when any number of rows are selected -->
@@ -38,6 +39,7 @@
                     v-model="colAction"
                     @change="handleColAction()"
                     :aria-label="$t('editor.datatable.colActions')"
+                    :disabled="!Object.values(selectedCols).some((col) => col)"
                 >
                     <option value="" hidden>{{ $t('editor.datatable.colActions') }}</option>
                     <!-- Enable insert when exactly one col is selected, enable delete when any number of cols are selected -->
@@ -301,6 +303,7 @@ const handleRowAction = (): void => {
         case rowActions.delete: {
             dataStore.deleteRows(rowIdxs);
             chartStore.deleteRow(rowIdxs.map((rowIdx) => parseInt(rowIdx)));
+            selectedRows = reactive({}); // reset the selections
             break;
         }
         case rowActions.insertBelow: {
@@ -311,12 +314,12 @@ const handleRowAction = (): void => {
         case rowActions.insertAbove: {
             dataStore.addNewRow(rowIdxs[0], false);
             chartStore.insertRow(parseInt(rowIdxs[0]));
+            const newIdx = (parseInt(rowIdxs[0]) + 1).toString();
+            selectedRows[rowIdxs[0]] = false;
+            selectedRows[newIdx] = true; //reselect the previous selected row
             break;
         }
     }
-
-    // clear row action selection
-    selectedRows = reactive({});
     rowAction.value = '';
 };
 
@@ -326,6 +329,7 @@ const handleColAction = (): void => {
         case colActions.delete: {
             dataStore.deleteCols(colIdxs);
             chartStore.deleteColumn(colIdxs.map((colIdx) => parseInt(colIdx)));
+            selectedCols = reactive({}); // reset the selections
             break;
         }
         case colActions.insertRight: {
@@ -336,12 +340,14 @@ const handleColAction = (): void => {
         case colActions.insertLeft: {
             dataStore.addNewCol(colIdxs[0], false);
             chartStore.insertColumn(parseInt(colIdxs[0]));
+            const newIdx = (parseInt(colIdxs[0]) + 1).toString();
+            selectedCols[colIdxs[0]] = false;
+            selectedCols[newIdx] = true; //reselect the previous selected col
             break;
         }
     }
 
     // clear col action selection
-    selectedCols = reactive({});
     colAction.value = '';
 };
 </script>
