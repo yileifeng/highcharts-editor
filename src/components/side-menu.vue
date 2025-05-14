@@ -12,7 +12,6 @@
                     delay: '200',
                     placement: 'right',
                     content: expanded ? $t('editor.collapse') : $t('editor.expand'),
-                    onShow: () => !expanded,
                     animateFill: true
                 }"
             >
