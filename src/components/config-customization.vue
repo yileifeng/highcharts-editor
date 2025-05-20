@@ -156,7 +156,7 @@ onBeforeMount(() => {
 
 onMounted(() => {
     // import highcharts schema for validation
-    const schemaUrl = '../../HighchartsSchema.json';
+    const schemaUrl = './HighchartsSchema.json';
     fetch(schemaUrl).then((schema) => {
         // parse JSON schema
         schema.json().then(
