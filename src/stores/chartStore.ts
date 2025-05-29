@@ -435,8 +435,8 @@ export const useChartStore = defineStore('chartProperties', {
         updateHybridChart(hybridSeries: string[], hybridType: string): void {
             this.setHybridChartType(hybridType);
             this.chartConfig.series.forEach((series, index) => {
-            const isHybrid = hybridSeries.includes(series.name);
-                if (isHybrid) {
+                if (hybridSeries.includes(series.name)) {
+                    const isHybrid = hybridSeries.includes(series.name);
                     // TODO: may need to adjust based on what hybrid options become available in the future
                     const baseConfig = {
                         name: series.name,
