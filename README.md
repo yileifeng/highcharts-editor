@@ -1,4 +1,4 @@
-# highcharts-editor
+# highcharts-accessible-configuration-kit
 
 ## Project setup
 ```

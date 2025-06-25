@@ -4,8 +4,8 @@
     "private": false,
     "license": "MIT",
     "type": "module",
-    "repository": "https://github.com/ramp4-pcar4/highcharts-editor",
-    "bugs": "https://github.com/ramp4-pcar4/highcharts-editor/issues",
+    "repository": "https://github.com/ramp4-pcar4/highcharts-accessible-configuration-kit",
+    "bugs": "https://github.com/ramp4-pcar4/highcharts-accessible-configuration-kit/issues",
     "scripts": {
         "dev": "vite",
         "serve": "vite preview",
