@@ -147,7 +147,7 @@
                             :aria-label="$t('HACK.datatable.addNewCol')"
                         ></td>
                     </tr>
-                    <tr :class="gridData.length % 2 === 0 ? 'bg-gray-50' : ''">
+                    <tr :class="gridData.length % 2 === 0 ? '' : 'bg-gray-50'">
                         <td
                             class="border cursor-pointer border-dotted border-gray-400 p-2 text-center font-bold text-gray-600"
                             @click="addNewRow"

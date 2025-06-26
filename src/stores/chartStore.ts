@@ -92,6 +92,9 @@ export const useChartStore = defineStore('chartProperties', {
                 },
                 xAxis: {
                     ...chartConfig.xAxis,
+                    categories: Array.isArray(chartConfig.xAxis?.categories)
+                        ? chartConfig.xAxis.categories
+                        : new Array(chartConfig.series?.[0]?.data?.length || 0).fill(''),
                     title: {
                         text: chartConfig.xAxis?.title?.text || ''
                     }
