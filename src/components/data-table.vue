@@ -326,7 +326,9 @@ onMounted(() => {
         });
 
         dataStore.setGridData(gridData);
-    } else document.addEventListener('click', handleMouseClick);
+    } else {
+        document.addEventListener('click', handleMouseClick);
+    }
 });
 
 onBeforeUnmount(() => {
