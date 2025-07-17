@@ -36,6 +36,16 @@ export interface HighchartsConfig {
         };
         enabled?: boolean;
     };
+    legend?: {
+        enabled?: boolean;
+    };
+    tooltip?: {
+        footerFormat?: string;
+        format?: string;
+        headerFormat?: string;
+        pointFormat?: string;
+        useHTML?: boolean;
+    };
     series: SeriesData[] | { data: SeriesData[] };
 }
 export interface SeriesData {

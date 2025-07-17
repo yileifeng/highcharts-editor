@@ -161,6 +161,7 @@ export const useChartStore = defineStore('chartProperties', {
             selectedSeries?: string,
             currentColours?: string[]
         ): void {
+            this.chartConfig.tooltip = {};
             switch (type) {
                 case chartTemplates.area: {
                     this.setChartType('area');
@@ -200,21 +201,20 @@ export const useChartStore = defineStore('chartProperties', {
                 }
                 case chartTemplates.scatter: {
                     this.setChartType('scatter');
+                    // TODO (if need to support coords format data):
                     // check if there exist categories (string values as first col) or if data is formatted as points in (x, y)
-                    const firstColNumeric = gridData.every((row) => !isNaN(parseFloat(row[0])));
-                    if (firstColNumeric) {
-                        const seriesData = gridData.map((row) => ({
-                            x: parseFloat(row[0]),
-                            y: parseFloat(row[1])
-                        }));
-                        const seriesNames = Object.values(headers).slice(1);
-                        this.updateScatterPlot(seriesNames, seriesData);
-                    } else {
-                        const seriesData = headers
-                            .slice(1)
-                            .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
-                        this.updateScatterPlot(series, seriesData);
-                    }
+                    // const firstColNumeric = gridData.every((row) => !isNaN(parseFloat(row[0])));
+                    // if (firstColNumeric && headers.length === 2) {
+                    //     const seriesData = gridData.map((row) => ({
+                    //         x: parseFloat(row[0]),
+                    //         y: parseFloat(row[1])
+                    //     }));
+                    //     const seriesNames = Object.values(headers).slice(1);
+                    //     this.updateScatterPlot(seriesNames, seriesData);
+                    const seriesData = headers
+                        .slice(1)
+                        .map((_, colIdx) => gridData.map((row) => parseFloat(row[colIdx + 1])));
+                    this.updateScatterPlot(series, seriesData);
 
                     break;
                 }
@@ -336,57 +336,29 @@ export const useChartStore = defineStore('chartProperties', {
         },
 
         /* Update highcharts configuration for scatter plot **/
-        updateScatterPlot(
-            seriesNames: string[],
-            seriesData: { x: number; y: number }[] | number[][],
-            cats?: string[]
-        ): void {
-            // re-initialize chart config for special x y case of scatter plot data
-            if (typeof seriesData === 'object') {
-                this.chartConfig = {
-                    title: {
-                        text: this.defaultTitle || ''
-                    },
-                    subtitle: {
-                        text: ''
-                    },
-                    xAxis: {
-                        ...(cats ? { categories: cats } : {}),
-                        title: {
-                            text: ''
-                        }
-                    },
-                    yAxis: {
-                        title: {
-                            text: ''
-                        }
-                    },
-                    series: seriesNames.map((name, index) => ({
-                        name: name,
-                        type: 'scatter',
-                        color: this.defaultColours[index],
-                        dashStyle: 'solid',
-                        marker: {
-                            symbol: 'circle'
-                        },
-                        data: seriesData[index]
-                    }))
-                };
-            } else {
-                this.chartConfig.series = this.chartConfig.series.map((series, index) =>
-                    seriesNames.includes(series.name)
-                        ? {
-                              name: series.name,
-                              type: 'scatter',
-                              color: this.defaultColours[index],
-                              dashStyle: 'solid',
-                              marker: { symbol: 'circle' },
-                              data: seriesData[index]
-                          }
-                        : series
-                );
-            }
+        updateScatterPlot(seriesNames: string[], seriesData: { x: number; y: number }[] | number[][]): void {
+            this.chartConfig.series = this.chartConfig.series.map((series, index) =>
+                seriesNames.includes(series.name)
+                    ? {
+                          name: series.name,
+                          type: 'scatter',
+                          color: this.defaultColours[index],
+                          dashStyle: 'solid',
+                          marker: { symbol: 'circle' },
+                          data: seriesData[index]
+                      }
+                    : series
+            );
             this.chartConfig.legend = { enabled: true };
+            // customize tooltip
+            this.chartConfig.tooltip = {
+                useHTML: true,
+                headerFormat: '<span style="font-size: 10px">{point.key}</span><table>',
+                pointFormat:
+                    '<tr><td><span style="color:{series.color}">\u25CF</span> {series.name}: </td>' +
+                    '<td style="text-align: right"><b> {point.y}</b></td></tr>',
+                footerFormat: '</table>'
+            };
         },
 
         /* Update highcharts configuration for column chart **/
