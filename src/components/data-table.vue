@@ -79,7 +79,7 @@
                             :key="colIdx"
                             @click="editColHeader(colIdx)"
                         >
-                            <div class="flex items-center w-full">
+                            <div class="flex items-center w-full" style="cursor: text;">
                                 <input
                                     :ref="(el) => (headerInput[colIdx] = el as HTMLInputElement | null)"
                                     class="col-header max-w-[calc(100%-21px)] box-border border border-transparent font-bold p-1 bg-transparent focus:border-black focus:bg-white rounded-md"
@@ -126,7 +126,7 @@
                             :key="colIdx"
                             @click="editCell(rowIdx, colIdx, value)"
                         >
-                            <div class="flex items-center w-full">
+                            <div class="flex items-center w-full" style="cursor: text;">
                                 <input
                                     :ref="
                                         (el) =>
