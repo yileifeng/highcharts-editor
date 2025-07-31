@@ -172,7 +172,12 @@
         <div class="font-bold mt-8">{{ $t('HACK.preview') }}</div>
         <!-- Preview of chart -->
         <div class="dv-chart-container items-stretch h-full w-full mt-2">
-            <highchart :key="chartStore.refreshKey" :options="chartConfig"></highchart>
+            <highchart
+                :key="chartStore.refreshKey"
+                :options="chartConfig"
+                :constructor-type="isStockChart ? 'stockChart' : 'chart'"
+                :highcharts="isStockChart ? Highstock : Highcharts"
+            ></highchart>
         </div>
 
         <div class="flex items-center mt-4">
@@ -200,6 +205,7 @@ import { useI18n } from 'vue-i18n';
 import { CurrentView } from '../definitions';
 
 import Highcharts from 'highcharts';
+import Highstock from 'highcharts/highstock';
 import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';
@@ -231,10 +237,13 @@ const $papa: any = inject('$papa');
 const dataStore = useDataStore();
 const chartStore = useChartStore();
 
+const isStockChart = computed(() => {
+    return chartStore.highchartType === 'stock';
+});
 const headers = computed(() => dataStore.headers);
 const gridData = computed(() => dataStore.gridData);
 const chartConfig = computed(() => {
-    return chartStore.chartConfig
+    return chartStore.chartConfig;
 });
 
 const headerInput = ref<(HTMLInputElement | null)[]>([]);
@@ -281,7 +290,7 @@ const colActions: Record<string, string> = {
     insertRight: 'insertRight'
 };
 
-onMounted(() => {
+onMounted(async () => {
     const config = chartStore.chartConfig;
 
     let seriesArray: any[] = [];
@@ -293,6 +302,26 @@ onMounted(() => {
     const isPieChart = seriesArray.length >= 1 && seriesArray[0].type === 'pie';
 
     if (props.uploadedFile || props.pastedFile) {
+        // handle uploaded JSON file
+        if (props.uploadedFile && props.uploadedFile.type === 'application/json') {
+            const text = await props.uploadedFile.text();
+            const jsonData = JSON.parse(text);
+            console.log('Parsed JSON data: ', jsonData);
+            if (
+                Array.isArray(jsonData) &&
+                Array.isArray(jsonData[0]) &&
+                typeof jsonData[0][0] === 'number' &&
+                typeof jsonData[0][1] === 'number'
+            ) {
+                dataStore.setHeaders(['x', 'y']);
+                dataStore.setGridData(jsonData.map((row: any) => Object.values(row)));
+                chartStore.setupTemporalConfig(jsonData);
+            } else {
+                console.error('Invalid JSON data format');
+            }
+            return;
+        }
+
         // parse uploaded file or pasted data
         $papa.parse(props.uploadedFile || props.pastedFile, {
             header: true, // first row headers
@@ -314,7 +343,8 @@ onMounted(() => {
                 );
 
                 // set a non-empty default chart title
-                chartStore.chartConfig.title.text = chartStore.defaultTitle || t('HACK.customization.titles.chartTitle');
+                chartStore.chartConfig.title.text =
+                    chartStore.defaultTitle || t('HACK.customization.titles.chartTitle');
             },
             error: (err: any) => {
                 console.error('Error parsing file: ', err);

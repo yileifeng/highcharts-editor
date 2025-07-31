@@ -15,10 +15,11 @@ export const useChartStore = defineStore('chartProperties', {
     state: () => ({
         chartType: 'line' as string,
         refreshKey: 0 as number,
+        highchartType: 'normal' as string,
         defaultTitle: '' as string,
+        chartConfig: {} as HighchartsConfig,
         hybridChartType: '' as string,
         chartSeries: [] as string[],
-        chartConfig: {} as HighchartsConfig,
         selectedHybridSeries: [] as string[],
         defaultColours: [
             '#2caffe',
@@ -38,6 +39,7 @@ export const useChartStore = defineStore('chartProperties', {
         /* Reset store to initial state **/
         resetStore(): void {
             this.chartType = 'line';
+            this.highchartType = 'normal';
             this.defaultTitle = '';
             this.hybridChartType = '';
             this.chartSeries = [];
@@ -156,6 +158,74 @@ export const useChartStore = defineStore('chartProperties', {
                 }))
             };
             this.setChartType('line');
+            this.highchartType = 'normal';
+        },
+
+        setupTemporalConfig(seriesData: [number, number][]): void {
+            this.chartConfig = {
+                chart: {
+                    zoomType: 'x'
+                },
+                title: {
+                    text: ''
+                },
+                subtitle: {
+                    text: ''
+                },
+                rangeSelector: {
+                    selected: 1,
+                    buttons: [
+                        {
+                            type: 'month',
+                            count: 1,
+                            text: '1m'
+                        },
+                        {
+                            type: 'month',
+                            count: 3,
+                            text: '3m'
+                        },
+                        {
+                            type: 'month',
+                            count: 6,
+                            text: '6m'
+                        },
+                        {
+                            type: 'ytd',
+                            text: 'YTD'
+                        },
+                        {
+                            type: 'all',
+                            text: 'All'
+                        }
+                    ]
+                },
+                xAxis: {
+                    type: 'datetime',
+                    title: {
+                        text: ''
+                    }
+                },
+                yAxis: {
+                    title: {
+                        text: ''
+                    }
+                },
+                series: [
+                    {
+                        type: 'line',
+                        data: seriesData,
+                        tooltip: {
+                            valueDecimals: 2
+                        }
+                    }
+                ],
+                tooltip: {
+                    xDateFormat: '%Y-%m-%d'
+                }
+            };
+            this.setChartType('line');
+            this.highchartType = 'stock';
         },
 
         /* Update highcharts configuration for chart type **/

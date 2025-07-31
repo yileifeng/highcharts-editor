@@ -41,7 +41,7 @@
                         type="file"
                         class="cursor-pointer"
                         @change="onFileUpload($event)"
-                        accept=".csv,.xlsx,.xls"
+                        accept=".csv,.xlsx,.xls,.json"
                         tabindex="-1"
                         :aria-label="$t('HACK.data.upload')"
                         :disabled="fileName !== ''"
@@ -159,6 +159,7 @@ const fileInput = ref<HTMLInputElement | null>(null);
 const uploadError = ref(false);
 const allowedTypes = [
     'text/csv',
+    'application/json',
     'application/vnd.ms-excel',
     'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
 ];

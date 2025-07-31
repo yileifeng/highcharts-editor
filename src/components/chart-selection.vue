@@ -122,7 +122,7 @@ import { useChartStore } from '../stores/chartStore';
 import { useDataStore } from '../stores/dataStore';
 import { CurrentView } from '../definitions';
 
-import Highcharts from 'highcharts';
+import Highcharts from 'highcharts/highstock';
 import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';

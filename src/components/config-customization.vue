@@ -131,7 +131,7 @@ import TitlesCustomization from './helpers/titles-customization.vue';
 import DataCustomization from './helpers/data-customization.vue';
 import AxesCustomization from './helpers/axes-customization.vue';
 
-import Highcharts from 'highcharts';
+import Highcharts from 'highcharts/highstock';
 import dataModule from 'highcharts/modules/data';
 import exporting from 'highcharts/modules/exporting';
 import exportData from 'highcharts/modules/export-data';

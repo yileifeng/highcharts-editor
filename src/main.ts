@@ -7,6 +7,7 @@ import i18n from './lang';
 import './style.css';
 
 import HighchartsVue from 'highcharts-vue';
+import Highcharts from 'highcharts';
 import VuePapaParse from 'vue-papa-parse';
 import VueTippy from 'vue-tippy';
 import 'tippy.js/dist/tippy.css';
@@ -25,7 +26,7 @@ const pinia = createPinia();
 app.use(pinia)
     .use(router)
     .use(i18n)
-    .use(HighchartsVue, { tagName: 'highchart' })
+    .use(HighchartsVue, { highcharts: Highcharts, tagName: 'highchart' })
     .use(VuePapaParse)
     .use(ColorPicker)
     .use(VueTippy, {
